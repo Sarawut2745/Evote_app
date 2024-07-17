@@ -1,66 +1,92 @@
-"use client"
+"use client";
 
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import Container from "../components/Container";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import Link from 'next/link'
-import { signIn } from 'next-auth/react'
-import { useRouter, redirect } from 'next/navigation'
-import { useSession } from 'next-auth/react';
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 function LoginPage() {
+  const [name, setName] = useState("");
+  const [error, setError] = useState("");
 
-    const [name, setName] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
+  const router = useRouter();
 
-    const router = useRouter();
-
-    const { data: session } = useSession();
-    if (session) router.replace('welcome');
-
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        try {
-
-            const res = await signIn("credentials", {
-                name, password, redirect: false
-            })
-
-            if (res.error) {
-                setError("Invalid credentials");
-                return;
-            }
-
-            router.replace("welcome");
-
-        } catch(error) {
-            console.log(error);
-        }
+  const { data: session } = useSession();
+  if (session) {
+    // ตรวจสอบ role และเปลี่ยนเส้นทางตาม role
+    if (session.user.role === "admin") {
+      router.replace("admin");
+    } else {
+      router.replace("vote");
     }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await signIn("credentials", {
+        name,
+        redirect: false,
+      });
+
+      if (res.error) {
+        setError("ไม่พบผู้ใช้");
+        return;
+      }
+
+      // เปลี่ยนเส้นทางตาม role หลังจากเข้าสู่ระบบสำเร็จ
+      if (res.user.role === "admin") {
+        router.replace("admin");
+      } else {
+        router.replace("vote");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <Container>
-        <Navbar />
-            <div className='flex-grow'>
-                <div className="flex justify-center items-center">
-                    <div className='w-[400px] shadow-xl p-10 mt-5 rounded-xl'>
-                        <h3 className='text-3xl'>ระบบเลือกตั้ง</h3>
-                        <hr className='my-3' />
-                        <form onSubmit={handleSubmit}>
-                            <input type="text" onChange={(e) => setName(e.target.value)} className='w-full bg-gray-200 border py-2 px-3 rounded text-lg my-2' placeholder='เลขประจำตัวนักเรียนนักศึกษา' />
-                            <button type='submit' className='bg-green-500 text-white border py-2 px-3 rounded text-lg my-2'>เข้าสู่ระบบ</button>
-                        </form>
-                        <hr className='my-3' />
-                    </div>
-                </div>
+      <Navbar />
+      <div className="relative flex flex-col justify-center h-screen overflow-hidden">
+        <div className="w-full p-6 m-auto bg-white rounded-md shadow-md lg:max-w-lg">
+          <h1 className="text-3xl font-semibold text-center">ระบบเลือกตั้ง</h1>
+          <hr className="my-3" />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="label">
+                <span className="text-base label-text">
+                  เลขประจำตัวนักเรียนนักศึกษา
+                </span>
+              </label>
+              <input
+                type="text"
+                onChange={(e) => setName(e.target.value)}
+                className="w-full input input-bordered"
+                placeholder="เลขประจำตัวนักเรียนนักศึกษา"
+              />
             </div>
-        <Footer />
+            <div>
+              <button
+                type="submit"
+                className="btn w-full"
+                style={{ backgroundColor: "rgb(228, 0, 58)" }}
+              >
+                เข้าสู่ระบบ
+              </button>
+            </div>
+          </form>
+          {error && <p className="text-red-500 text-center mt-3">{error}</p>}
+          <hr className="my-3" />
+        </div>
+      </div>
+      <Footer />
     </Container>
-  )
+  );
 }
 
-export default LoginPage
+export default LoginPage;
