@@ -4,12 +4,12 @@ const postSchema = new Schema(
     {
         title: String,
         img: String,
-        content: String,
+        number_no: Number,
     },
     {
         timestamps: true
     }
-)
+);
 
 const Post = mongoose.models.Election || mongoose.model("Election", postSchema);
 export default Post;

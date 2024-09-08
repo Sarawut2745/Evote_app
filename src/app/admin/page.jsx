@@ -1,22 +1,29 @@
 "use client";
 
-import React from "react";
-import Navbar from "../components/Navbar";
+import ECommerce from "../../components/Dashboard/E-commerce";
+import DefaultLayout from "../../components/Layouts/DefaultLayout";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 
-function admin() {
-    
-  const { data: session } = useSession();
-  if (!session) redirect("/login");
-  console.log(session);
+const Home = () => {
+  const { data: session, status } = useSession();
+
+  if (status === "loading") {
+    // You can add a loading state here if needed
+    return <div>Loading...</div>;
+  }
+
+  if (!session) {
+    redirect("/login");
+    return null; // To avoid rendering below components while redirecting
+  }
 
   return (
-    <div>
-      <Navbar />
-      <div>Admin</div>
-    </div>
+    <DefaultLayout>
+      <ECommerce />
+    </DefaultLayout>
   );
-}
+};
 
-export default admin;
+export default Home;
+

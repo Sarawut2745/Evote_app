@@ -6,6 +6,9 @@ const userSchema = new Schema(
             type: String,
             required: true
         },
+        user_type: {
+            type: String,
+        },
         role: {
             type: String,
             required: false,

@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import Container from "../components/Container";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import Container from "../../components/Container";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -52,29 +52,28 @@ function LoginPage() {
   return (
     <Container>
       <Navbar />
-      <div className="relative flex flex-col justify-center h-screen overflow-hidden">
+      <div className="relative bg-slate-100 flex flex-col justify-center h-screen overflow-hidden">
         <div className="w-full p-6 m-auto bg-white rounded-md shadow-md lg:max-w-lg">
-          <h1 className="text-3xl font-semibold text-center">ระบบเลือกตั้ง</h1>
+          <h1 className="text-3xl text-black font-semibold text-center">ระบบเลือกตั้ง</h1>
           <hr className="my-3" />
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="label">
-                <span className="text-base label-text">
+                <span className="text-base label-text text-black">
                   เลขประจำตัวนักเรียนนักศึกษา
                 </span>
               </label>
               <input
                 type="text"
                 onChange={(e) => setName(e.target.value)}
-                className="w-full input input-bordered"
+                className="w-full text-black bg-white input input-bordered input-teal-500"
                 placeholder="เลขประจำตัวนักเรียนนักศึกษา"
               />
             </div>
             <div>
               <button
                 type="submit"
-                className="btn w-full"
-                style={{ backgroundColor: "rgb(228, 0, 58)" }}
+                className="btn bg-teal-500 w-full text-black border-none"
               >
                 เข้าสู่ระบบ
               </button>
