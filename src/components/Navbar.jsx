@@ -1,14 +1,14 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { signOut, useSession } from "next-auth/react";
+import CustomModal from "../components/CustomModal";
 
 function Navbar() {
   const { data: session } = useSession();
   const [postData, setPostData] = useState([]);
   const [userType, setUserType] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const getPosts = async () => {
@@ -22,10 +22,8 @@ function Navbar() {
         const data = await res.json();
         setPostData(data.posts);
 
-      
         if (data.posts.length > 0) {
-          const userTypeFromPostData = data.posts[0].user_type;
-          setUserType(userTypeFromPostData);
+          setUserType(data.posts[0].user_type);
         }
       } catch (error) {
         console.error("Error loading posts:", error);
@@ -35,8 +33,7 @@ function Navbar() {
     getPosts();
   }, []);
 
-  const handleVote = async (e) => {
-    e.preventDefault();
+  const handleVote = async () => {
     if (userType === null) {
       console.error("User type is not set");
       return;
@@ -53,15 +50,23 @@ function Navbar() {
 
       if (res.ok) {
         console.log("Vote registered successfully");
-       
+        signOut();
+        setIsModalOpen(false);
       } else {
         console.error("Failed to register vote");
-       
       }
     } catch (error) {
       console.error("Error during vote registration:", error);
-     
     }
+  };
+
+  const openModal = (e) => {
+    e.preventDefault();
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -80,10 +85,10 @@ function Navbar() {
         {session && (
           <>
             <li>
-              <form onSubmit={handleVote}>
+              <form onSubmit={openModal}>
                 <button
                   type="submit"
-                  className="btn btn-success text-white border py-2 px-3 rounded-md text-lg shadow-md m-0"
+                  className="btn btn-success text-white border py-2 px-3 rounded-md text-lg shadow-md"
                 >
                   ไม่ประสงค์ลงคะแนน
                 </button>
@@ -92,7 +97,7 @@ function Navbar() {
             <li>
               <button
                 onClick={() => signOut()}
-                className="btn btn-error text-white border py-2 px-3 rounded-md text-lg shadow-md m-0"
+                className="btn btn-error text-white border py-2 px-3 rounded-md text-lg shadow-md"
                 aria-label="Logout"
               >
                 Logout
@@ -101,6 +106,12 @@ function Navbar() {
           </>
         )}
       </ul>
+
+      <CustomModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onConfirm={handleVote}
+      />
     </nav>
   );
 }

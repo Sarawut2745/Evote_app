@@ -1,0 +1,39 @@
+/* CustomModal.css */
+.popup-enter {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  
+  .popup-enter-active {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 300ms ease-out, transform 300ms ease-out;
+  }
+  
+  .popup-exit {
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  .popup-exit-active {
+    opacity: 0;
+    transform: scale(0.8);
+    transition: opacity 300ms ease-in, transform 300ms ease-in;
+  }
+  
+  .fixed {
+    /* Ensure no extra border or shadow is applied */
+    outline: none;
+  }
+  
+  .bg-white {
+    /* Ensure no extra shadow or border is applied */
+    box-shadow: none;
+    border: none;
+  }
+  
+  .bg-black.bg-opacity-50 {
+    /* Ensure the overlay does not have unwanted styles */
+    background: rgba(0, 0, 0, 0.5);
+  }
+  

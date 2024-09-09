@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { connectMongoDB } from '../../../../lib/mongodb';
 import Scores from '../../../../models/scores_el';
 import User from '../../../../models/user';
+import { signOut, useSession } from "next-auth/react";
 
 export async function POST(req) {
   try {

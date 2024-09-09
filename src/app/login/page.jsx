@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Container from "../../components/Container";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
@@ -13,16 +13,18 @@ function LoginPage() {
   const [error, setError] = useState("");
 
   const router = useRouter();
-
   const { data: session } = useSession();
-  if (session) {
-    // ตรวจสอบ role และเปลี่ยนเส้นทางตาม role
-    if (session.user.role === "admin") {
-      router.replace("admin");
-    } else {
-      router.replace("vote");
+
+  useEffect(() => {
+    if (session) {
+      // ตรวจสอบ role และเปลี่ยนเส้นทางตาม role
+      if (session.user.role === "admin") {
+        router.replace("/admin");
+      } else {
+        router.replace("/vote");
+      }
     }
-  }
+  }, [session, router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,9 +42,9 @@ function LoginPage() {
 
       // เปลี่ยนเส้นทางตาม role หลังจากเข้าสู่ระบบสำเร็จ
       if (res.user.role === "admin") {
-        router.replace("admin");
+        router.replace("/admin");
       } else {
-        router.replace("vote");
+        router.replace("/vote");
       }
     } catch (error) {
       console.log(error);
@@ -54,7 +56,9 @@ function LoginPage() {
       <Navbar />
       <div className="relative bg-slate-100 flex flex-col justify-center h-screen overflow-hidden">
         <div className="w-full p-6 m-auto bg-white rounded-md shadow-md lg:max-w-lg">
-          <h1 className="text-3xl text-black font-semibold text-center">ระบบเลือกตั้ง</h1>
+          <h1 className="text-3xl text-black font-semibold text-center">
+            ระบบเลือกตั้ง
+          </h1>
           <hr className="my-3" />
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -66,14 +70,19 @@ function LoginPage() {
               <input
                 type="text"
                 onChange={(e) => setName(e.target.value)}
-                className="w-full text-black bg-white input input-bordered input-teal-500"
+                className="w-full text-black bg-slate-50 input border-2 border-gray-300 
+                  hover:border-teal-400 focus:border-teal-500 
+                  focus:ring-2 focus:ring-teal-200 
+                  transition-all duration-300 ease-in-out"
                 placeholder="เลขประจำตัวนักเรียนนักศึกษา"
               />
             </div>
             <div>
               <button
                 type="submit"
-                className="btn bg-teal-500 w-full text-black border-none"
+                className="btn bg-teal-500 w-full text-black border-none 
+                  hover:bg-teal-600 hover:text-white 
+                  focus:outline-none focus:ring-2 focus:ring-teal-400"
               >
                 เข้าสู่ระบบ
               </button>
