@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { signOut, useSession } from "next-auth/react";
@@ -6,35 +6,10 @@ import CustomModal from "../components/CustomModal";
 
 function Navbar() {
   const { data: session } = useSession();
-  const [postData, setPostData] = useState([]);
-  const [userType, setUserType] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    const getPosts = async () => {
-      try {
-        const res = await fetch("/api/vote", { cache: "no-store" });
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch posts");
-        }
-
-        const data = await res.json();
-        setPostData(data.posts);
-
-        if (data.posts.length > 0) {
-          setUserType(data.posts[0].user_type);
-        }
-      } catch (error) {
-        console.error("Error loading posts:", error);
-      }
-    };
-
-    getPosts();
-  }, []);
-
   const handleVote = async () => {
-    if (userType === null) {
+    if (session.user.user_type === null) {
       console.error("User type is not set");
       return;
     }
@@ -45,7 +20,7 @@ function Navbar() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ user_type: userType, number_no: 0 }),
+        body: JSON.stringify({ user_type: session.user.user_type, number_no: 0 }),
       });
 
       if (res.ok) {
@@ -111,6 +86,8 @@ function Navbar() {
         isOpen={isModalOpen}
         onClose={closeModal}
         onConfirm={handleVote}
+        title="ยืนยันการลงคะแนน"
+        content="คุณแน่ใจว่าต้องการลงคะแนนสำหรับตัวเลือกนี้หรือไม่?"
       />
     </nav>
   );

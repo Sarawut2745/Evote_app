@@ -19,10 +19,12 @@ const authOptions = {
             return null;
           }
 
+  
           return {
             id: user._id,
             name: user.name,
-            role: user.role, // เพิ่ม role ลงในข้อมูลผู้ใช้
+            role: user.role,
+            user_type: user.user_type, 
           };
         } catch (error) {
           console.log("Error: ", error);
@@ -40,27 +42,26 @@ const authOptions = {
   },
   callbacks: {
     async jwt({ token, user }) {
+    
       if (user) {
         return {
           ...token,
           id: user.id,
           role: user.role,
+          user_type: user.user_type,
         };
       }
       return token;
     },
     async session({ session, token }) {
+    
       return {
         ...session,
         user: {
           ...session.user,
           id: token.id,
           role: token.role,
-        },
-        admin: {
-          ...session.user,
-          id: token.id,
-          role: token.role,
+          user_type: token.user_type,
         },
       };
     },

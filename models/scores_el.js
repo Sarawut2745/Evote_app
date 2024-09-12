@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const postSchema = new Schema(
+const ScoresSchema = new Schema(
     {
         user_type: String,
         number_no: Number,
@@ -10,5 +10,5 @@ const postSchema = new Schema(
     }
 );
 
-const Post = mongoose.models.Scores_el || mongoose.model("Scores_el", postSchema);
-export default Post;
+const Scores = mongoose.models.Scores_el || mongoose.model("Scores_el", ScoresSchema);
+export default Scores;

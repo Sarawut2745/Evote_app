@@ -5,41 +5,18 @@ import { useState, useEffect } from "react";
 import Container from "../../components/Container";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
+import CustomModal from "../../components/CustomModal_Page";
 
 export default function Home() {
   const [postData, setPostData] = useState([]);
-  const [userType, setUserType] = useState(null);
-
-  console.log(postData);
-
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const res = await fetch("/api/vote", { cache: "no-store" });
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch posts");
-        }
-
-        const data = await res.json();
-        setPostData(data.posts);
-
-        if (data.posts.length > 0) {
-          setUserType(data.posts[0].user_type)
-        }
-      } catch (error) {
-        console.error("Error loading posts:", error);
-      }
-    };
-
-    getData();
-  }, []);
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const getPosts = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/election", {
+      const res = await fetch("/api/election", {
         cache: "no-store",
       });
 
@@ -59,10 +36,9 @@ export default function Home() {
   }, []);
 
   const handleVote = async () => {
-    if (userType === null) {
-      console.error("User type is not set");
-      return;
-    }
+    if (!selectedPost) return;
+
+    const { number_no, user_type } = selectedPost;
 
     try {
       const res = await fetch("/api/vote", {
@@ -70,11 +46,13 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ user_type: userType, number_no: 1 }),
+        body: JSON.stringify({ user_type, number_no }), 
       });
 
       if (res.ok) {
-        console.log("Vote registered successfully")
+        console.log("Vote registered successfully");
+        setIsModalOpen(false);
+        signOut();
       } else {
         console.error("Failed to register vote");
       }
@@ -83,9 +61,27 @@ export default function Home() {
     }
   };
 
-  const { data: session } = useSession();
-  if (!session) redirect("/login");
-  console.log(session);
+  const openModal = (post) => {
+    setSelectedPost({
+      ...post,
+      user_type: session.user.user_type, 
+    });
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const { data: session, status } = useSession();
+
+  if (status === "loading") {
+    return <div>Loading...</div>;
+  }
+
+  if (!session) {
+    redirect("/login");
+  }
 
   return (
     <main>
@@ -93,9 +89,9 @@ export default function Home() {
         <Navbar session={session} />
         <div className="flex-grow bg-white text-center p-10">
           <h3 className="text-black text-title-md2">รายชื่อผู้สมัคร</h3>
-          <div className="grid grid-cols-6 mt-3 gap-5">
-            {postData && postData.length > 0 ? (
-              postData.map((val) => (
+          {postData && postData.length > 0 && (
+            <div className="grid grid-cols-6 mt-3 gap-5">
+              {postData.map((val) => (
                 <div
                   key={val._id}
                   className="shadow-xl col-span-2 my-3 p-3 rounded-xl flex flex-col items-center"
@@ -110,17 +106,25 @@ export default function Home() {
                       alt={val.title}
                     />
                   </div>
-                  <button onClick={handleVote} className="relative h-12 w-40 overflow-hidden border border-stone-900 text-stone-900 shadow-2xl transition-all duration-200 before:absolute before:bottom-0 before:left-0 before:right-0 before:top-0 before:m-auto before:h-0 before:w-0 before:rounded-sm before:bg-stone-900 before:duration-300 before:ease-out hover:text-white hover:shadow-stone-900 hover:before:h-40 hover:before:w-40 hover:before:opacity-80">
+                  <button
+                    onClick={() => openModal(val)}
+                    className="relative h-12 w-40 overflow-hidden border border-stone-900 text-stone-900 shadow-2xl transition-all duration-200 before:absolute before:bottom-0 before:left-0 before:right-0 before:top-0 before:m-auto before:h-0 before:w-0 before:rounded-sm before:bg-stone-900 before:duration-300 before:ease-out hover:text-white hover:shadow-stone-900 hover:before:h-40 hover:before:w-40 hover:before:opacity-80"
+                  >
                     <span className="relative z-10">เลือก</span>
                   </button>
                 </div>
-              ))
-            ) : (
-              <p className="bg-gray-300 p-3 mt-3">ยังไม่มีข้อมูลคนเลือกตั้ง.</p>
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
         <Footer />
+        <CustomModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          onConfirm={handleVote}
+          title="ยืนยันการลงคะแนน"
+          content="คุณแน่ใจว่าต้องการลงคะแนนสำหรับตัวเลือกนี้หรือไม่?"
+        />
       </Container>
     </main>
   );

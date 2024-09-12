@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const postSchema = new Schema(
+const ElectionSchema = new Schema(
     {
         title: String,
         img: String,
@@ -11,5 +11,5 @@ const postSchema = new Schema(
     }
 );
 
-const Post = mongoose.models.Election || mongoose.model("Election", postSchema);
-export default Post;
+const Election = mongoose.models.Election || mongoose.model("Election", ElectionSchema);
+export default Election;
