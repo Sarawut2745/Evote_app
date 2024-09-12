@@ -83,7 +83,7 @@ function RegisterPage() {
                         <form onSubmit={handleSubmit}>
 
                             {error && (
-                                <div className='bg-red-500 w-fit text-sm text-white py-1 px-3 rounded-md mt-2'>
+                                <div className='bg-red w-fit text-sm text-white py-1 px-3 rounded-md mt-2'>
                                     {error}
                                 </div>
                             )}

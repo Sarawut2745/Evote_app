@@ -88,7 +88,7 @@ function LoginPage() {
               </button>
             </div>
           </form>
-          {error && <p className="text-red-500 text-center mt-3">{error}</p>}
+          {error && <p className="text-red text-center mt-3">{error}</p>}
           <hr className="my-3" />
         </div>
       </div>

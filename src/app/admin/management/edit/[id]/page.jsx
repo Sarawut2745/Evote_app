@@ -8,7 +8,8 @@ function EditPostPage({ params }) {
   const { id } = params;
   const [postData, setPostData] = useState({});
   const [newTitle, setNewTitle] = useState("");
-  const [newImg, setNewImg] = useState("");
+  const [newImg, setNewImg] = useState(null);
+  const [imgPreview, setImgPreview] = useState("");
   const [newNumber_no, setNewNumber_no] = useState("");
   const [titleError, setTitleError] = useState("");
   const [imgError, setImgError] = useState("");
@@ -27,11 +28,13 @@ function EditPostPage({ params }) {
       }
 
       const data = await res.json();
-      console.log("Edit post: ", data);
+      console.log("DATA post: ", data);
       setPostData(data);
       setNewTitle(data.post?.title || "");
-      setNewImg(data.post?.img || "");
       setNewNumber_no(data.post?.number_no || "");
+      if (data.post?.img) {
+        setImgPreview(`/assets/${data.post.img}`);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -41,47 +44,73 @@ function EditPostPage({ params }) {
     getPostById(id);
   }, [id]);
 
+  // Function to resize image
+  const resizeImage = (file, width, height) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        img.src = reader.result;
+      };
+
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size to desired output size
+        canvas.width = width;
+        canvas.height = height;
+
+        // Draw image on canvas
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert canvas to Blob
+        canvas.toBlob((blob) => {
+          resolve(new File([blob], file.name, { type: file.type }));
+        }, file.type);
+      };
+
+      img.onerror = reject;
+      reader.onerror = reject;
+
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleImageChange = async (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setNewImg(await resizeImage(file, 250, 250)); // Resize image to 500x250
+      setImgPreview(URL.createObjectURL(await resizeImage(file, 250, 250)));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setTitleError("");
-    setImgError("");
-    setNumberNoError("");
-
-    let isValid = true;
-    if (!newTitle.trim()) {
-      setTitleError("Title is required.");
-      isValid = false;
-    }
-    if (!newImg.trim()) {
-      setImgError("Image URL is required.");
-      isValid = false;
-    }
-    if (!newNumber_no.toString().trim()) {
-      setNumberNoError("Number is required.");
-      isValid = false;
-    }
-
-    if (!isValid) {
-      return;
+    const formData = new FormData();
+    formData.append('title', newTitle);
+    formData.append('number_no', newNumber_no);
+    if (newImg) {
+      formData.append('img', newImg); // Append resized File object
     }
 
     try {
       const res = await fetch(`/api/election/${id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ newTitle, newImg, newNumber_no }),
+        body: formData,
       });
 
       if (!res.ok) {
-        throw new Error("Failed to update post");
+        const errorData = await res.json();
+        console.error("API Error:", errorData);
+        throw new Error(errorData.Message || "Failed to update post");
       }
 
       router.push("/admin/management");
     } catch (error) {
-      console.log(error);
+      console.error("Error in handleSubmit:", error);
     }
   };
 
@@ -124,17 +153,22 @@ function EditPostPage({ params }) {
             </p>
           )}
           <label className="block text-gray-700 font-medium mb-2" htmlFor="img">
-            Image URL
+            Image
           </label>
+          {imgPreview && (
+            <div className="mb-4">
+              <img src={imgPreview} alt="Current Image" className="w-full h-auto" />
+            </div>
+          )}
           <input
             id="img"
-            value={newImg}
-            onChange={(e) => setNewImg(e.target.value)}
-            type="text"
-            className="w-full bg-gray border border-black py-2 px-4 rounded text-lg"
-            placeholder="Enter image URL"
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className=""
           />
         </div>
+
         <div className="mb-6">
           {numberNoError && (
             <p className="text-white bg-red inline-block px-4 py-2 rounded-lg text-left mb-2">

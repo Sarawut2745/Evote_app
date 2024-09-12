@@ -31,7 +31,7 @@ function CreatePostPage() {
             });
 
             if (res.ok) {
-                router.push("/admin");
+                router.push("/admin/management");
             } else {
                 throw new Error("Failed to create a post");
             }
