@@ -3,13 +3,14 @@ import Post from "../../../../models/election";
 import { NextResponse } from "next/server";
 import path from "path";
 import { writeFile } from "fs/promises";
+import { unlink } from "fs/promises";
 
 export async function POST(req) {
   try {
     const formData = await req.formData();
-    const title = formData.get('title');
-    const img = formData.get('img');
-    const number_no = formData.get('number_no');
+    const title = formData.get("title");
+    const img = formData.get("img");
+    const number_no = formData.get("number_no");
 
     if (!title || !img || !number_no) {
       return NextResponse.json({ Message: "Missing fields", status: 400 });
@@ -40,8 +41,37 @@ export async function GET() {
 }
 
 export async function DELETE(req) {
-  const id = req.nextUrl.searchParams.get("id");
-  await connectMongoDB();
-  await Post.findByIdAndDelete(id);
-  return NextResponse.json({ message: "Post deleted" }, { status: 200 });
+  try {
+    const id = req.nextUrl.searchParams.get("id");
+    if (!id) {
+      return NextResponse.json({ message: "ID not provided" }, { status: 400 });
+    }
+
+    await connectMongoDB();
+    const post = await Post.findById(id);
+
+    if (!post) {
+      return NextResponse.json({ message: "Post not found" }, { status: 404 });
+    }
+
+    await Post.findByIdAndDelete(id);
+
+    const imgPath = path.join(process.cwd(), "public/assets", post.img);
+
+    try {
+      await unlink(imgPath);
+      console.log(`File ${imgPath} deleted successfully`);
+    } catch (fileError) {
+      console.error(`Failed to delete file ${imgPath}:`, fileError);
+    }
+
+    return NextResponse.json(
+      { message: "Post and file deleted" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error occurred:", error);
+    return NextResponse.json({ message: "Failed", status: 500 });
+  }
 }
+

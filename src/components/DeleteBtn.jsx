@@ -17,7 +17,7 @@ function DeleteBtn({ id }) {
       });
 
       if (res.ok) {
-        router.push("/admin/management"); // Use router.push to navigate
+        window.location.reload();
       }
     }
   };
