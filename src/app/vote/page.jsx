@@ -104,7 +104,7 @@ export default function Home() {
               width={250}
               height={250}
               alt={val.title}
-              objectFit="cover" // หรือ "contain" ถ้าต้องการ
+              objectFit="cover"
             />
           </div>
           <button

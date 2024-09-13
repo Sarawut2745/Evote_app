@@ -11,6 +11,7 @@ function EditPostPage({ params }) {
   const [newImg, setNewImg] = useState(null);
   const [imgPreview, setImgPreview] = useState("");
   const [newNumber_no, setNewNumber_no] = useState("");
+  const [oldImgName, setOldImgName] = useState(""); // Keep the old image name
   const [titleError, setTitleError] = useState("");
   const [imgError, setImgError] = useState("");
   const [numberNoError, setNumberNoError] = useState("");
@@ -28,12 +29,12 @@ function EditPostPage({ params }) {
       }
 
       const data = await res.json();
-      console.log("DATA post: ", data);
       setPostData(data);
       setNewTitle(data.post?.title || "");
       setNewNumber_no(data.post?.number_no || "");
       if (data.post?.img) {
         setImgPreview(`/assets/${data.post.img}`);
+        setOldImgName(data.post.img); // Save the old image name
       }
     } catch (error) {
       console.log(error);
@@ -44,7 +45,6 @@ function EditPostPage({ params }) {
     getPostById(id);
   }, [id]);
 
-  // Function to resize image
   const resizeImage = (file, width, height) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -55,17 +55,13 @@ function EditPostPage({ params }) {
       };
 
       img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        // Set canvas size to desired output size
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
         canvas.width = width;
         canvas.height = height;
-
-        // Draw image on canvas
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Convert canvas to Blob
         canvas.toBlob((blob) => {
           resolve(new File([blob], file.name, { type: file.type }));
         }, file.type);
@@ -81,7 +77,7 @@ function EditPostPage({ params }) {
   const handleImageChange = async (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setNewImg(await resizeImage(file, 250, 250)); // Resize image to 500x250
+      setNewImg(await resizeImage(file, 250, 250)); // Resize image to 250x250
       setImgPreview(URL.createObjectURL(await resizeImage(file, 250, 250)));
     }
   };
@@ -90,10 +86,10 @@ function EditPostPage({ params }) {
     e.preventDefault();
 
     const formData = new FormData();
-    formData.append('title', newTitle);
-    formData.append('number_no', newNumber_no);
+    formData.append("title", newTitle);
+    formData.append("number_no", newNumber_no);
     if (newImg) {
-      formData.append('img', newImg); // Append resized File object
+      formData.append("img", newImg);
     }
 
     try {
@@ -116,94 +112,104 @@ function EditPostPage({ params }) {
 
   return (
     <div className="container mx-auto py-10 px-4">
-      <nav className="bg-slate-900 text-white py-4 mx-auto px-6 shadow-md mb-8">
-        <div className="flex items-center justify-between">
-          <h3 className="text-3xl font-bold">Edit Election</h3>
-        </div>
-      </nav>
-      <form
-        onSubmit={handleSubmit}
-        className="max-w-lg mx-auto bg-white p-8 rounded-lg shadow-lg"
-      >
-        <div className="mb-6">
-          {titleError && (
-            <p className="text-white bg-red inline-block px-4 py-2 rounded-lg text-left mb-2">
-              {titleError}
-            </p>
-          )}
-          <label
-            className="block text-gray-700 font-medium mb-2"
-            htmlFor="title"
-          >
-            Title
-          </label>
-          <input
-            id="title"
-            value={newTitle}
-            onChange={(e) => setNewTitle(e.target.value)}
-            type="text"
-            className="w-full bg-gray border border-black py-2 px-4 rounded text-lg"
-            placeholder="Enter title"
-          />
-        </div>
-        <div className="mb-6">
-          {imgError && (
-            <p className="text-white bg-red inline-block px-4 py-2 rounded-lg text-left mb-2">
-              {imgError}
-            </p>
-          )}
-          <label className="block text-gray-700 font-medium mb-2" htmlFor="img">
-            Image
-          </label>
-          {imgPreview && (
-            <div className="mb-4">
-              <img src={imgPreview} alt="Current Image" className="w-full h-auto" />
-            </div>
-          )}
-          <input
-            id="img"
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className=""
-          />
-        </div>
+      <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
+        <h3 className="text-4xl font-bold text-gray-800 mb-6 text-center">
+          Edit Election
+        </h3>
+        <hr className="my-4" />
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            {titleError && (
+              <p className="text-white bg-red inline-block px-4 py-2 rounded-lg text-left mb-2">
+                {titleError}
+              </p>
+            )}
+            <label className="block text-lg font-medium text-gray-700 mb-2">
+              Name Election
+            </label>
+            <input
+              id="title"
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              type="text"
+              className="w-full bg-gray-100 border border-gray-300 py-2 px-4 rounded-lg text-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Enter title"
+            />
+          </div>
 
-        <div className="mb-6">
-          {numberNoError && (
-            <p className="text-white bg-red inline-block px-4 py-2 rounded-lg text-left mb-2">
-              {numberNoError}
-            </p>
-          )}
-          <label
-            className="block text-gray-700 font-medium mb-2"
-            htmlFor="number_no"
-          >
-            Number
-          </label>
-          <input
-            id="number_no"
-            value={newNumber_no}
-            onChange={(e) => setNewNumber_no(e.target.value)}
-            className="w-full bg-gray border border-black py-2 px-4 rounded text-lg"
-            placeholder="Enter number"
-          />
-        </div>
-        <div className="flex justify-between">
-          <button
-            type="submit"
-            className="bg-green-500 hover:bg-green-600 text-white border py-2 px-4 rounded text-lg"
-          >
-            Edit Election
-          </button>
-          <Link
-            href="/admin/management"
-            className="bg-red hover:bg-red text-white border py-2 px-4 rounded text-lg"
-          >
-            Go Back
-          </Link>
-        </div>
-      </form>
+          <div>
+            {imgError && (
+              <p className="text-white bg-red inline-block px-4 py-2 rounded-lg text-left mb-2">
+                {imgError}
+              </p>
+            )}
+            <label className="block text-lg font-medium text-gray-700 mb-2">
+              Upload Image
+            </label>
+            {imgPreview && (
+              <div className="my-4">
+                <img
+                  src={imgPreview}
+                  alt="Current Image"
+                  className="w-[250px] h-[250px] object-cover rounded-lg shadow"
+                />
+              </div>
+            )}
+            <div className="relative">
+              <input
+                id="img"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
+              <label
+                htmlFor="img"
+                className="bg-blue-500 text-white py-2 px-4 rounded-lg inline-block cursor-pointer hover:bg-blue-600 transition duration-200"
+              >
+                Choose File
+              </label>
+              <span className="ml-3 text-gray-500">
+                {newImg ? newImg.name : oldImgName}
+              </span>
+            </div>
+          </div>
+
+          <div>
+            {numberNoError && (
+              <p className="text-white bg-red inline-block px-4 py-2 rounded-lg text-left mb-2">
+                {numberNoError}
+              </p>
+            )}
+            <label className="block text-lg font-medium text-gray-700 mb-2">
+              Number
+            </label>
+            <input
+              id="number_no"
+              type="number"
+              value={newNumber_no}
+              onChange={(e) => setNewNumber_no(e.target.value)}
+              className="w-full bg-gray border border-gray py-2 px-4 rounded-lg text-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Enter number"
+            />
+          </div>
+
+          <div className="flex justify-between">
+            <button
+              type="submit"
+              className="bg-green-500 hover:bg-green-600 text-white border py-2 px-4 rounded text-lg"
+            >
+              Edit Election
+            </button>
+            <Link
+              href="/admin/management"
+              className="bg-red hover:bg-red-600 text-white border py-2 px-4 rounded text-lg"
+            >
+              Go Back
+            </Link>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

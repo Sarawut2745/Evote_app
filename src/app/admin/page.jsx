@@ -1,29 +1,32 @@
 "use client";
 
-import ECommerce from "../../components/Dashboard/E-commerce";
-import DefaultLayout from "../../components/Layouts/DefaultLayout";
-import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { useEffect, useState } from 'react';
 
-const Home = () => {
-  const { data: session, status } = useSession();
+const CountsPage = () => {
+  const [counts, setCounts] = useState([]);
 
-  if (status === "loading") {
-    // You can add a loading state here if needed
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {
+    const fetchCounts = async () => {
+      const response = await fetch('/api/scores'); // Adjust the endpoint path
+      const data = await response.json();
+      setCounts(data.counts);
+    };
 
-  if (!session) {
-    redirect("/login");
-    return null; // To avoid rendering below components while redirecting
-  }
+    fetchCounts();
+  }, []);
 
   return (
-    <DefaultLayout>
-      <ECommerce />
-    </DefaultLayout>
+    <div>
+      <h1>Number No Counts</h1>
+      <ul>
+        {counts.map(({ number_no, count }) => (
+          <li key={number_no}>
+            Number No: {number_no}, Count: {count}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };
 
-export default Home;
-
+export default CountsPage;

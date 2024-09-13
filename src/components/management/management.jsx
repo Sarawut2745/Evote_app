@@ -27,10 +27,10 @@ export default function Management() {
   };
 
   useEffect(() => {
-    getPosts(); // Load all posts when component mounts
+    getPosts();
   }, []);
 
-  // Function to handle search
+ 
   const handleSearch = async (event) => {
     event.preventDefault();
 
@@ -41,16 +41,16 @@ export default function Management() {
       }
 
       const data = await response.json();
-      setPostData(data.posts); // Update the post list with search results
+      setPostData(data.posts); 
     } catch (error) {
       console.log("Search error: ", error);
     }
   };
 
-  // Function to reset search
+
   const handleReset = async () => {
-    setSearchQuery(""); // Clear search input
-    getPosts(); // Fetch and display all posts again
+    setSearchQuery(""); 
+    getPosts(); 
   };
 
   return (
@@ -60,7 +60,7 @@ export default function Management() {
       </div>
 
       <div className="mb-6 flex justify-between items-center">
-        {/* Search Form */}
+
         <form
           className="flex items-center space-x-4 max-w-lg bg-white border border-gray-300 rounded-lg shadow-md p-4"
           onSubmit={handleSearch}
@@ -79,7 +79,6 @@ export default function Management() {
             Search
           </button>
 
-          {/* Reset Button */}
           <button
             type="button"
             onClick={handleReset}
@@ -89,7 +88,6 @@ export default function Management() {
           </button>
         </form>
 
-        {/* Add Post Button */}
         <Link
           className="btn bg-green-500 hover:bg-green-500 text-white py-1 px-3 rounded-lg shadow-sm transition border-green-500 duration-150 ease-in-out"
           href={`/admin/management/create`}
@@ -99,10 +97,9 @@ export default function Management() {
         </Link>
       </div>
 
-      {/* Post Table */}
       <div className="overflow-x-auto bg-white border border-gray-300 rounded-lg shadow-md">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-100">
+          <thead className="bg-gray">
             <tr>
               <th className="text-center text-gray-600 py-2 px-4">#</th>
               <th className="text-center text-gray-600 py-2 px-4">IMAGE</th>
