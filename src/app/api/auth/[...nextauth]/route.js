@@ -19,7 +19,6 @@ const authOptions = {
             return null;
           }
 
-  
           return {
             id: user._id,
             name: user.name,
@@ -38,11 +37,11 @@ const authOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
-    signIn: "/login",
+    signIn: "/login", // หน้าเข้าสู่ระบบ
+    signOut: "/login", // หน้าออกจากระบบ
   },
   callbacks: {
     async jwt({ token, user }) {
-    
       if (user) {
         return {
           ...token,
@@ -54,7 +53,6 @@ const authOptions = {
       return token;
     },
     async session({ session, token }) {
-    
       return {
         ...session,
         user: {
@@ -65,6 +63,12 @@ const authOptions = {
         },
       };
     },
+    async redirect({ url, baseUrl }) {
+      if (url === '/api/auth/signout') {
+        return baseUrl; // เปลี่ยนเส้นทางหลังการล็อกเอ้าท์
+      }
+      return url.startsWith(baseUrl) ? url : baseUrl;
+    }
   },
 };
 

@@ -52,7 +52,7 @@ export default function Home() {
       if (res.ok) {
         console.log("Vote registered successfully");
         setIsModalOpen(false);
-        signOut();
+        await signOut({ redirect: false });
       } else {
         console.error("Failed to register vote");
       }
@@ -76,7 +76,7 @@ export default function Home() {
   const { data: session, status } = useSession();
 
   if (status === "loading") {
-    return <div>Loading...</div>;
+    return <div>กำลังโหลด...</div>;
   }
 
   if (!session) {

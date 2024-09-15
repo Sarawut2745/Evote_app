@@ -9,7 +9,7 @@ function CreatePostPage() {
   const [img, setImg] = useState(null);
   const [number_no, setNumber] = useState("");
   const [preview, setPreview] = useState(null);
-  const [fileName, setFileName] = useState("Choose a file");
+  const [fileName, setFileName] = useState("โปรดเลือกรูป");
 
   const router = useRouter();
 
@@ -21,7 +21,7 @@ function CreatePostPage() {
       setFileName(file.name);
     } else {
       setPreview(null);
-      setFileName("Choose a file");
+      setFileName("โปรดเลือกรูป");
     }
   };
 
@@ -58,26 +58,26 @@ function CreatePostPage() {
     <div className="container mx-auto py-10 px-4">
       <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
         <h3 className="text-4xl font-bold text-gray-800 mb-6 text-center">
-          Add Election
+        เพิ่มผู้สมัคร
         </h3>
         <hr className="my-4" />
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-lg font-medium text-gray-700 mb-2">
-              Name Election
+              ชื่อผู้สมัคร และเบอร์หมายเลข
             </label>
             <input
               onChange={(e) => setTitle(e.target.value)}
               type="text"
               value={title}
               className="w-full bg-gray-100 border border-gray-300 py-2 px-4 rounded-lg text-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Enter Name Election"
+              placeholder="ป้อนชื่อผู้สมัคร และ เบอร์หมายเลข"
             />
           </div>
 
           <div>
             <label className="block text-lg font-medium text-gray-700 mb-2">
-              Upload Image
+              อัพโหลดรูปภาพ
             </label>
             <div className="relative">
               <input
@@ -90,7 +90,7 @@ function CreatePostPage() {
                 htmlFor="file-input"
                 className="bg-blue-500 text-white py-2 px-4 rounded-lg inline-block cursor-pointer hover:bg-blue-600 transition duration-200"
               >
-                Choose File
+                เลือกรูป
               </label>
               <span className="ml-3 text-gray-500">{fileName}</span>
             </div>
@@ -99,7 +99,7 @@ function CreatePostPage() {
           {preview && (
             <div className="my-4">
               <p className="text-lg font-medium text-gray-700 mb-2">
-                Image Preview
+                ตัวอย่างรูปภาพ
               </p>
               <img
                 src={preview}
@@ -111,14 +111,14 @@ function CreatePostPage() {
 
           <div>
             <label className="block text-lg font-medium text-gray-700 mb-2">
-              Number
+              เบอร์หมายเลข
             </label>
             <input
               onChange={(e) => setNumber(e.target.value)}
               value={number_no}
               type="number"
               className="w-full bg-gray-100 border border-gray-300 py-2 px-4 rounded-lg text-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Enter your Number"
+              placeholder="ป้อนเบอร์หมายเลข"
             />
           </div>
 
@@ -127,13 +127,13 @@ function CreatePostPage() {
               type="submit"
               className="bg-green-500 hover:bg-green-600 text-white border py-2 px-4 rounded text-lg"
             >
-              Create Post
+              เพิ่มผู้สมัคร
             </button>
             <Link
               href="/admin/management"
               className="bg-red hover:bg-red text-white border py-2 px-4 rounded text-lg"
             >
-              Go back
+              ย้อนกลับ
             </Link>
           </div>
         </form>

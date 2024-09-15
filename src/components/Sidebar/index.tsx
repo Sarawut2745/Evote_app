@@ -21,8 +21,8 @@ const menuGroups = [
   {
     name: "MENU",
     menuItems: [ 
-      { icon: (<FontAwesomeIcon icon={faTachometerAlt} />), label: "Dashboard", route: "/admin", }, 
-      { icon: (<FontAwesomeIcon icon={faCog} />), label: "Management", route: "/admin/management", },
+      { icon: (<FontAwesomeIcon icon={faTachometerAlt} />), label: "แผนควบคุม", route: "/admin", }, 
+      { icon: (<FontAwesomeIcon icon={faCog} />), label: "การจัดการ", route: "/admin/management", },
     ],
   },
 ];

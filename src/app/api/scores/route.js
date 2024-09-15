@@ -1,31 +1,28 @@
 import { connectMongoDB } from "../../../../lib/mongodb";
 import Scores from "../../../../models/scores_el";
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
 
 export async function GET() {
   await connectMongoDB();
 
-  // Aggregation pipeline to count occurrences of every number_no
-  const counts = await Scores.aggregate([
-    {
-      $group: {
-        _id: "$number_no",
-        count: { $sum: 1 },
-      },
-    },
-    {
-      $project: {
-        _id: 0,
-        number_no: "$_id",
-        count: 1,
-      },
-    },
-    {
-      $sort: {
-        count: -1, // Optional: sort by count in descending order
-      },
-    },
+  // Aggregate counts by user_type
+  const userTypeCounts = await Scores.aggregate([
+    { $group: { _id: "$user_type", count: { $sum: 1 } } },
+    { $project: { _id: 0, user_type: "$_id", count: 1 } }
   ]);
 
-  return NextResponse.json({ counts });
+  // Aggregate counts by number_no
+  const numberNoCounts = await Scores.aggregate([
+    { $group: { _id: "$number_no", count: { $sum: 1 } } },
+    { $project: { _id: 0, number_no: "$_id", count: 1 } }
+  ]);
+
+  // Total document count
+  const totalDocumentCount = await Scores.countDocuments();
+
+  return NextResponse.json({
+    userTypeCounts,
+    numberNoCounts,
+    totalDocumentCount,  // Return the total document count
+  });
 }

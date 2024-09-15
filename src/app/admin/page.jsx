@@ -1,32 +1,28 @@
 "use client";
+import ChartsPage from "../../components/ChartsPage";
+import DefaultLayout from "../../components/Layouts/DefaultLayout";
+import { useSession } from "next-auth/react";
+import { redirect } from "next/navigation";
 
-import { useEffect, useState } from 'react';
+const Home = () => {
+  const { data: session, status } = useSession();
 
-const CountsPage = () => {
-  const [counts, setCounts] = useState([]);
+  if (status === "loading") {
+    return <div>กำลังโหลด...</div>;
+  }
 
-  useEffect(() => {
-    const fetchCounts = async () => {
-      const response = await fetch('/api/scores'); // Adjust the endpoint path
-      const data = await response.json();
-      setCounts(data.counts);
-    };
-
-    fetchCounts();
-  }, []);
+  if (!session) {
+    redirect("/login");
+    return null;
+  }
 
   return (
     <div>
-      <h1>Number No Counts</h1>
-      <ul>
-        {counts.map(({ number_no, count }) => (
-          <li key={number_no}>
-            Number No: {number_no}, Count: {count}
-          </li>
-        ))}
-      </ul>
+      <DefaultLayout>
+        <ChartsPage />
+      </DefaultLayout>
     </div>
   );
 };
 
-export default CountsPage;
+export default Home;

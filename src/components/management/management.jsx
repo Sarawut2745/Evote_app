@@ -56,7 +56,7 @@ export default function Management() {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="mb-6">
-        <h3 className="text-2xl font-semibold text-gray-800">Management</h3>
+        <h3 className="text-2xl font-semibold text-gray-800">การจัดการ</h3>
       </div>
 
       <div className="mb-6 flex justify-between items-center">
@@ -68,7 +68,7 @@ export default function Management() {
           <input
             className="flex-1 bg-white border border-gray-300 text-gray-700 placeholder-gray-500 py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
             type="text"
-            placeholder="Search..."
+            placeholder="ค้นหา..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -76,7 +76,7 @@ export default function Management() {
             type="submit"
             className="bg-blue-500 hover:blue-500 text-white border border-transparent py-2 px-4 rounded-lg text-lg shadow-md transition duration-150 ease-in-out"
           >
-            Search
+            ค้นหา
           </button>
 
           <button
@@ -84,7 +84,7 @@ export default function Management() {
             onClick={handleReset}
             className="bg-gray hover:bg-gray text-black border border-transparent py-2 px-4 rounded-lg text-lg shadow-md transition duration-150 ease-in-out"
           >
-            Reset
+            รีเซ็ต
           </button>
         </form>
 
@@ -93,7 +93,7 @@ export default function Management() {
           href={`/admin/management/create`}
         >
           <FontAwesomeIcon icon={faPlus} className="mr-2" />
-          Add election
+          เพิ่มผู้สมัคร
         </Link>
       </div>
 
@@ -102,11 +102,11 @@ export default function Management() {
           <thead className="bg-gray">
             <tr>
               <th className="text-center text-gray-600 py-2 px-4">#</th>
-              <th className="text-center text-gray-600 py-2 px-4">IMAGE</th>
-              <th className="text-left text-gray-600 py-2 px-4">NAME</th>
-              <th className="text-left text-gray-600 py-2 px-4">NUMBER</th>
+              <th className="text-center text-gray-600 py-2 px-4">รูปภาพ</th>
+              <th className="text-left text-gray-600 py-2 px-4">ชื่อ</th>
+              <th className="text-left text-gray-600 py-2 px-4">เบอร์หมายเลข</th>
               <th className="text-center text-gray-600 py-2 px-4">
-                MANAGEMENT
+                การจัดการ
               </th>
             </tr>
           </thead>
@@ -143,7 +143,7 @@ export default function Management() {
             ) : (
               <tr>
                 <td colSpan="5" className="py-4 text-center text-gray-500">
-                  No posts available
+                  ไม่มีผู้สมัคร
                 </td>
               </tr>
             )}

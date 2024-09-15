@@ -11,7 +11,7 @@ function EditPostPage({ params }) {
   const [newImg, setNewImg] = useState(null);
   const [imgPreview, setImgPreview] = useState("");
   const [newNumber_no, setNewNumber_no] = useState("");
-  const [oldImgName, setOldImgName] = useState(""); // Keep the old image name
+  const [oldImgName, setOldImgName] = useState("");
   const [titleError, setTitleError] = useState("");
   const [imgError, setImgError] = useState("");
   const [numberNoError, setNumberNoError] = useState("");
@@ -34,7 +34,7 @@ function EditPostPage({ params }) {
       setNewNumber_no(data.post?.number_no || "");
       if (data.post?.img) {
         setImgPreview(`/assets/${data.post.img}`);
-        setOldImgName(data.post.img); // Save the old image name
+        setOldImgName(data.post.img); 
       }
     } catch (error) {
       console.log(error);
@@ -77,7 +77,7 @@ function EditPostPage({ params }) {
   const handleImageChange = async (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setNewImg(await resizeImage(file, 250, 250)); // Resize image to 250x250
+      setNewImg(await resizeImage(file, 250, 250));
       setImgPreview(URL.createObjectURL(await resizeImage(file, 250, 250)));
     }
   };
@@ -114,7 +114,7 @@ function EditPostPage({ params }) {
     <div className="container mx-auto py-10 px-4">
       <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
         <h3 className="text-4xl font-bold text-gray-800 mb-6 text-center">
-          Edit Election
+          แก้ไขข้อมูลผู้สมัคร
         </h3>
         <hr className="my-4" />
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -125,7 +125,7 @@ function EditPostPage({ params }) {
               </p>
             )}
             <label className="block text-lg font-medium text-gray-700 mb-2">
-              Name Election
+            ชื่อผู้สมัคร และเบอร์หมายเลข
             </label>
             <input
               id="title"
@@ -133,7 +133,7 @@ function EditPostPage({ params }) {
               onChange={(e) => setNewTitle(e.target.value)}
               type="text"
               className="w-full bg-gray-100 border border-gray-300 py-2 px-4 rounded-lg text-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Enter title"
+              placeholder="ป้อนชื่อผู้สมัคร และ เบอร์หมายเลข"
             />
           </div>
 
@@ -144,7 +144,7 @@ function EditPostPage({ params }) {
               </p>
             )}
             <label className="block text-lg font-medium text-gray-700 mb-2">
-              Upload Image
+            ตัวอย่างรูปภาพ
             </label>
             {imgPreview && (
               <div className="my-4">
@@ -167,7 +167,7 @@ function EditPostPage({ params }) {
                 htmlFor="img"
                 className="bg-blue-500 text-white py-2 px-4 rounded-lg inline-block cursor-pointer hover:bg-blue-600 transition duration-200"
               >
-                Choose File
+                เลือกรูป
               </label>
               <span className="ml-3 text-gray-500">
                 {newImg ? newImg.name : oldImgName}
@@ -182,7 +182,7 @@ function EditPostPage({ params }) {
               </p>
             )}
             <label className="block text-lg font-medium text-gray-700 mb-2">
-              Number
+            เบอร์หมายเลข
             </label>
             <input
               id="number_no"
@@ -190,7 +190,7 @@ function EditPostPage({ params }) {
               value={newNumber_no}
               onChange={(e) => setNewNumber_no(e.target.value)}
               className="w-full bg-gray border border-gray py-2 px-4 rounded-lg text-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Enter number"
+               placeholder="ป้อนเบอร์หมายเลข"
             />
           </div>
 
@@ -199,13 +199,13 @@ function EditPostPage({ params }) {
               type="submit"
               className="bg-green-500 hover:bg-green-600 text-white border py-2 px-4 rounded text-lg"
             >
-              Edit Election
+              แก้ไขข้อมูลผู้สมัคร
             </button>
             <Link
               href="/admin/management"
               className="bg-red hover:bg-red-600 text-white border py-2 px-4 rounded text-lg"
             >
-              Go Back
+              ย้อนกลับ
             </Link>
           </div>
         </form>

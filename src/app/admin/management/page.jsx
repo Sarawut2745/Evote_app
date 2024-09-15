@@ -9,7 +9,7 @@ const Home = () => {
 
   if (status === "loading") {
    
-    return <div>Loading...</div>;
+    return <div>กำลังโหลด...</div>;
   }
 
   if (!session) {

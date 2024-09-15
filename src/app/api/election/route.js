@@ -1,5 +1,6 @@
 import { connectMongoDB } from "../../../../lib/mongodb";
 import Post from "../../../../models/election";
+import Scores from "../../../../models/scores_el";
 import { NextResponse } from "next/server";
 import path from "path";
 import { writeFile } from "fs/promises";
@@ -48,6 +49,8 @@ export async function DELETE(req) {
     }
 
     await connectMongoDB();
+
+    // ค้นหา Post โดย ID
     const post = await Post.findById(id);
 
     if (!post) {
@@ -55,6 +58,9 @@ export async function DELETE(req) {
     }
 
     await Post.findByIdAndDelete(id);
+
+
+    await Scores.deleteMany({ number_no: post.number_no });
 
     const imgPath = path.join(process.cwd(), "public/assets", post.img);
 
@@ -66,7 +72,7 @@ export async function DELETE(req) {
     }
 
     return NextResponse.json(
-      { message: "Post and file deleted" },
+      { message: "Post, related scores, and file deleted" },
       { status: 200 }
     );
   } catch (error) {
@@ -74,4 +80,3 @@ export async function DELETE(req) {
     return NextResponse.json({ message: "Failed", status: 500 });
   }
 }
-

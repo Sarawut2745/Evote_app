@@ -25,7 +25,7 @@ function Navbar() {
 
       if (res.ok) {
         console.log("Vote registered successfully");
-        signOut();
+        await signOut({ redirect: false });
         setIsModalOpen(false);
       } else {
         console.error("Failed to register vote");
@@ -71,7 +71,10 @@ function Navbar() {
             </li>
             <li>
               <button
-                onClick={() => signOut()}
+                 onClick={async () => {
+                  await signOut({ redirect: false });
+                 
+                }}
                 className="btn btn-error text-white border py-2 px-3 rounded-md text-lg shadow-md"
                 aria-label="Logout"
               >
