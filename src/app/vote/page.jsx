@@ -87,37 +87,37 @@ export default function Home() {
     <main>
       <Container>
         <Navbar session={session} />
-        <div className="flex-grow bg-white text-center p-10">
-  <h3 className="text-black text-title-md2">รายชื่อผู้สมัคร</h3>
-  {postData && postData.length > 0 && (
-    <div className="grid grid-cols-4 gap-5">
-      {postData.map((val) => (
-        <div
-          key={val._id}
-          className="shadow-xl my-3 p-3 rounded-xl flex flex-col items-center"
-        >
-          <h4 className="text-2xl">{val.title}</h4>
-          <div className="flex justify-center w-full">
-            <Image
-              className="my-3 rounded-md"
-              src={`/assets/${val.img}`}
-              width={250}
-              height={250}
-              alt={val.title}
-              objectFit="cover"
-            />
-          </div>
-          <button
-            onClick={() => openModal(val)}
-            className="relative h-12 w-40 overflow-hidden border border-stone-900 text-stone-900 shadow-2xl transition-all duration-200 before:absolute before:bottom-0 before:left-0 before:right-0 before:top-0 before:m-auto before:h-0 before:w-0 before:rounded-sm before:bg-stone-900 before:duration-300 before:ease-out hover:text-white hover:shadow-stone-900 hover:before:h-40 hover:before:w-40 hover:before:opacity-80"
-          >
-            <span className="relative z-10">เลือก</span>
-          </button>
+        <div className="flex-grow bg-white text-center p-4 md:p-6 lg:p-8 xl:p-10">
+          <h3 className="text-black text-lg md:text-xl lg:text-2xl mb-6">รายชื่อผู้สมัคร</h3>
+          {postData && postData.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {postData.map((val) => (
+                <div
+                  key={val._id}
+                  className="shadow-md p-4 rounded-xl flex flex-col items-center bg-white"
+                >
+                  <h4 className="text-lg md:text-xl mb-3">{val.title}</h4>
+                  <div className="flex justify-center w-full mb-3">
+                    <Image
+                      className="rounded-md"
+                      src={`/assets/${val.img}`}
+                      width={200}
+                      height={200}
+                      alt={val.title}
+                      objectFit="cover"
+                    />
+                  </div>
+                  <button
+                    onClick={() => openModal(val)}
+                    className="relative h-10 w-36 md:w-40 lg:w-44 overflow-hidden border border-stone-900 text-stone-900 shadow-md transition-all duration-200 before:absolute before:bottom-0 before:left-0 before:right-0 before:top-0 before:m-auto before:h-0 before:w-0 before:rounded-sm before:bg-stone-900 before:duration-300 before:ease-out hover:text-white hover:shadow-stone-900 hover:before:h-full hover:before:w-full hover:before:opacity-80"
+                  >
+                    <span className="relative z-10">เลือก</span>
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      ))}
-    </div>
-  )}
-</div>
 
         <Footer />
         <CustomModal
