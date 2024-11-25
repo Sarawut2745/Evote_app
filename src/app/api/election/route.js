@@ -9,29 +9,73 @@ import { unlink } from "fs/promises";
 export async function POST(req) {
   try {
     const formData = await req.formData();
-    const title = formData.get("title");
-    const img = formData.get("img");
+    const name = formData.get("name");
+    const img_profile = formData.get("img_profile");
     const number_no = formData.get("number_no");
+    const department = formData.get("department");
+    const class_room = formData.get("class_room");
+    const party_policies = formData.get("party_policies");
+    const party_details = formData.get("party_details");
+    const img_work = formData.get("img_work");
 
-    if (!title || !img || !number_no) {
-      return NextResponse.json({ Message: "Missing fields", status: 400 });
+    if (
+      !name ||
+      !img_profile ||
+      !number_no ||
+      !department ||
+      !class_room ||
+      !party_policies ||
+      !party_details ||
+      !img_work
+    ) {
+      return NextResponse.json({ message: "Missing fields", status: 400 });
     }
 
     await connectMongoDB();
-    const imgFilename = img.name.replaceAll(" ", "_");
-    const buffer = Buffer.from(await img.arrayBuffer());
 
+    // คำนวณลำดับ ID โดยนับจำนวนเอกสารในฐานข้อมูล
+    const postCount = await Post.countDocuments({});
+    const profileFilename = `P${(postCount + 1).toString().padStart(11, '0')}`;
+    const workFilename = `W${(postCount + 1).toString().padStart(11, '0')}`;
+
+    // ดึงนามสกุลไฟล์จาก input (เช่น .jpg, .png)
+    const profileExt = path.extname(img_profile.name).toLowerCase(); // นามสกุลไฟล์ของ img_profile
+    const workExt = path.extname(img_work.name).toLowerCase(); // นามสกุลไฟล์ของ img_work
+
+    // สร้างชื่อไฟล์ใหม่พร้อมนามสกุล
+    const profileFileWithExt = profileFilename + profileExt; // เช่น P00000000001.jpg
+    const workFileWithExt = workFilename + workExt; // เช่น W00000000001.png
+
+    const profileBuffer = Buffer.from(await img_profile.arrayBuffer());
+    const workBuffer = Buffer.from(await img_work.arrayBuffer());
+
+    // บันทึกไฟล์ในโฟลเดอร์
     await writeFile(
-      path.join(process.cwd(), "public/assets", imgFilename),
-      buffer
+      path.join(process.cwd(), "public/assets/election/profile", profileFileWithExt),
+      profileBuffer
     );
 
-    await Post.create({ title, img: imgFilename, number_no });
+    await writeFile(
+      path.join(process.cwd(), "public/assets/election/work", workFileWithExt),
+      workBuffer
+    );
 
-    return NextResponse.json({ Message: "Success", status: 201 });
+    // สร้างข้อมูลในฐานข้อมูล
+    await Post.create({
+      name,
+      img_profile: profileFileWithExt,
+      number_no,
+      department,
+      class_room,
+      party_policies,
+      party_details,
+      img_work: workFileWithExt,
+    });
+
+    return NextResponse.json({ message: "Success", status: 201 });
   } catch (error) {
     console.error("Error occurred:", error);
-    return NextResponse.json({ Message: "Failed", status: 500 });
+    return NextResponse.json({ message: "Failed", status: 500 });
   }
 }
 
@@ -59,10 +103,13 @@ export async function DELETE(req) {
 
     await Post.findByIdAndDelete(id);
 
-
     await Scores.deleteMany({ number_no: post.number_no });
 
-    const imgPath = path.join(process.cwd(), "public/assets", post.img);
+    const imgPath = path.join(
+      process.cwd(),
+      "public/assets/election/profile",
+      post.img
+    );
 
     try {
       await unlink(imgPath);
