@@ -10,6 +10,7 @@ export async function POST(req) {
   try {
     const formData = await req.formData();
     const name = formData.get("name");
+    const personal_ip = formData.get("personal_ip");
     const img_profile = formData.get("img_profile");
     const number_no = formData.get("number_no");
     const department = formData.get("department");
@@ -20,6 +21,7 @@ export async function POST(req) {
 
     if (
       !name ||
+      !personal_ip ||
       !img_profile ||
       !number_no ||
       !department ||
@@ -35,8 +37,8 @@ export async function POST(req) {
 
     // คำนวณลำดับ ID โดยนับจำนวนเอกสารในฐานข้อมูล
     const postCount = await Post.countDocuments({});
-    const profileFilename = `P${(postCount + 1).toString().padStart(11, '0')}`;
-    const workFilename = `W${(postCount + 1).toString().padStart(11, '0')}`;
+    const profileFilename = `P${(postCount + 1).toString().padStart(11, "0")}`;
+    const workFilename = `W${(postCount + 1).toString().padStart(11, "0")}`;
 
     // ดึงนามสกุลไฟล์จาก input (เช่น .jpg, .png)
     const profileExt = path.extname(img_profile.name).toLowerCase(); // นามสกุลไฟล์ของ img_profile
@@ -51,7 +53,11 @@ export async function POST(req) {
 
     // บันทึกไฟล์ในโฟลเดอร์
     await writeFile(
-      path.join(process.cwd(), "public/assets/election/profile", profileFileWithExt),
+      path.join(
+        process.cwd(),
+        "public/assets/election/profile",
+        profileFileWithExt
+      ),
       profileBuffer
     );
 
@@ -63,6 +69,7 @@ export async function POST(req) {
     // สร้างข้อมูลในฐานข้อมูล
     await Post.create({
       name,
+      personal_ip,
       img_profile: profileFileWithExt,
       number_no,
       department,
@@ -101,25 +108,46 @@ export async function DELETE(req) {
       return NextResponse.json({ message: "Post not found" }, { status: 404 });
     }
 
+    // ลบ Post จากฐานข้อมูล
     await Post.findByIdAndDelete(id);
 
+    // ลบข้อมูลคะแนนที่เกี่ยวข้อง
     await Scores.deleteMany({ number_no: post.number_no });
 
-    const imgPath = path.join(
+    // ลบไฟล์รูปภาพ
+    const imgProfilePath = path.join(
       process.cwd(),
       "public/assets/election/profile",
-      post.img
+      post.img_profile
     );
 
+    const imgWorkPath = path.join(
+      process.cwd(),
+      "public/assets/election/work",
+      post.img_work
+    );
+
+    // ลบไฟล์โปรไฟล์
     try {
-      await unlink(imgPath);
-      console.log(`File ${imgPath} deleted successfully`);
+      await unlink(imgProfilePath);
+      console.log(`Profile image file ${imgProfilePath} deleted successfully`);
     } catch (fileError) {
-      console.error(`Failed to delete file ${imgPath}:`, fileError);
+      console.error(
+        `Failed to delete profile image: ${imgProfilePath}`,
+        fileError
+      );
+    }
+
+    // ลบไฟล์งาน
+    try {
+      await unlink(imgWorkPath);
+      console.log(`Work image file ${imgWorkPath} deleted successfully`);
+    } catch (fileError) {
+      console.error(`Failed to delete work image: ${imgWorkPath}`, fileError);
     }
 
     return NextResponse.json(
-      { message: "Post, related scores, and file deleted" },
+      { message: "Post, related scores, and files deleted" },
       { status: 200 }
     );
   } catch (error) {

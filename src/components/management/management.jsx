@@ -118,13 +118,13 @@ export default function Management() {
                   </td>
                   <td className="text-center py-2 px-4">
                     <img
-                      src={`/assets/${post.img}`}
+                      src={`/assets/election/profile/${post.img_profile}`}
                       width={100}
                       alt={post.title}
                       className="mx-auto rounded-lg shadow-sm"
                     />
                   </td>
-                  <td className="text-gray-700 py-2 px-4">{post.title}</td>
+                  <td className="text-gray-700 py-2 px-4">{post.name}</td>
                   <td className="text-gray-700 py-2 px-4">{post.number_no}</td>
                   <td className="py-2 px-4">
                     <div className="flex justify-center space-x-4">

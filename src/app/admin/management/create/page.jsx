@@ -68,6 +68,7 @@ function CreatePostPage() {
 
     const formData = new FormData();
     formData.append("name", name);
+    formData.append("personal_ip", personal_ip);
     formData.append("img_profile", img_profile);
     formData.append("number_no", number_no);
     formData.append("department", department);

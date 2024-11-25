@@ -1,22 +1,30 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 function EditPostPage({ params }) {
   const { id } = params;
   const [postData, setPostData] = useState({});
-  const [newTitle, setNewTitle] = useState("");
+  const [name, setName] = useState("");
+  const [personal_ip, setPersonal_ip] = useState("");
+  const [department, setDepartment] = useState("");
+  const [class_room, setClass_room] = useState("");
+  const [grade, setGrade] = useState("");
+  const [number_no, setNumber] = useState("");
+  const [party_policies, setParty_policies] = useState("");
+  const [party_details, setParty_details] = useState("");
+  const [preview_work, setPreview_work] = useState("");
+  const [fileName_work, setFileName_work] = useState("");
+  const [preview_profile, setPreview_profile] = useState("");
+  const [fileName_profile, setFileName_profile] = useState("");
   const [newImg, setNewImg] = useState(null);
-  const [imgPreview, setImgPreview] = useState("");
-  const [newNumber_no, setNewNumber_no] = useState("");
+  const [newWorkImg, setNewWorkImg] = useState(null);
   const [oldImgName, setOldImgName] = useState("");
-  const [titleError, setTitleError] = useState("");
-  const [imgError, setImgError] = useState("");
-  const [numberNoError, setNumberNoError] = useState("");
   const router = useRouter();
 
+  // Fetch post data by ID
   const getPostById = async (id) => {
     try {
       const res = await fetch(`/api/election/${id}`, {
@@ -25,17 +33,24 @@ function EditPostPage({ params }) {
       });
 
       if (!res.ok) {
-        throw new Error("Failed to fetch a post");
+        throw new Error("Failed to fetch post data");
       }
 
       const data = await res.json();
       setPostData(data);
-      setNewTitle(data.post?.title || "");
-      setNewNumber_no(data.post?.number_no || "");
-      if (data.post?.img) {
-        setImgPreview(`/assets/${data.post.img}`);
-        setOldImgName(data.post.img); 
-      }
+      setName(data.post?.name || "");
+      setPersonal_ip(data.post?.personal_ip || "");
+      setDepartment(data.post?.department || "");
+      setClass_room(data.post?.class_room || "");
+      setGrade(data.post?.grade || "");
+      setNumber(data.post?.number_no || "");
+      setParty_policies(data.post?.party_policies || "");
+      setParty_details(data.post?.party_details || "");
+      setPreview_work(`/assets/election/work/${data.post?.img_work}`);
+      setPreview_profile(`/assets/election/profile/${data.post?.img_profile}`);
+      setFileName_work(data.post?.work_image || "");
+      setFileName_profile(data.post?.profile_image || "");
+      setOldImgName(data.post?.profile_image);
     } catch (error) {
       console.log(error);
     }
@@ -45,40 +60,19 @@ function EditPostPage({ params }) {
     getPostById(id);
   }, [id]);
 
-  const resizeImage = (file, width, height) => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        img.src = reader.result;
-      };
-
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-
-        canvas.width = width;
-        canvas.height = height;
-        ctx.drawImage(img, 0, 0, width, height);
-
-        canvas.toBlob((blob) => {
-          resolve(new File([blob], file.name, { type: file.type }));
-        }, file.type);
-      };
-
-      img.onerror = reject;
-      reader.onerror = reject;
-
-      reader.readAsDataURL(file);
-    });
+  const handleImgChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setNewImg(e.target.files[0]);
+      setPreview_profile(URL.createObjectURL(e.target.files[0]));
+      setFileName_profile(e.target.files[0].name);
+    }
   };
 
-  const handleImageChange = async (e) => {
+  const handleImgwork = (e) => {
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setNewImg(await resizeImage(file, 250, 250));
-      setImgPreview(URL.createObjectURL(await resizeImage(file, 250, 250)));
+      setNewWorkImg(e.target.files[0]);
+      setPreview_work(URL.createObjectURL(e.target.files[0]));
+      setFileName_work(e.target.files[0].name);
     }
   };
 
@@ -86,11 +80,17 @@ function EditPostPage({ params }) {
     e.preventDefault();
 
     const formData = new FormData();
-    formData.append("title", newTitle);
-    formData.append("number_no", newNumber_no);
-    if (newImg) {
-      formData.append("img", newImg);
-    }
+    formData.append("name", name);
+    formData.append("personal_ip", personal_ip);
+    formData.append("department", department);
+    formData.append("class_room", class_room);
+    formData.append("grade", grade);
+    formData.append("number_no", number_no);
+    formData.append("party_policies", party_policies);
+    formData.append("party_details", party_details);
+
+    if (newImg) formData.append("profile_image", newImg);
+    if (newWorkImg) formData.append("work_image", newWorkImg);
 
     try {
       const res = await fetch(`/api/election/${id}`, {
@@ -99,9 +99,7 @@ function EditPostPage({ params }) {
       });
 
       if (!res.ok) {
-        const errorData = await res.json();
-        console.error("API Error:", errorData);
-        throw new Error(errorData.Message || "Failed to update post");
+        throw new Error("Failed to update post");
       }
 
       router.push("/admin/management");
@@ -111,99 +109,235 @@ function EditPostPage({ params }) {
   };
 
   return (
-    <div className="container mx-auto py-10 px-4">
-      <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
-        <h3 className="text-4xl font-bold text-gray-800 mb-6 text-center">
+    <div className="container mx-auto py-12 px-6">
+      <div className="max-w-3xl mx-auto bg-white p-10 rounded-lg shadow-md">
+        <h3 className="text-3xl font-bold text-gray-800 mb-6 text-center">
           แก้ไขข้อมูลผู้สมัคร
         </h3>
-        <hr className="my-4" />
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* ชื่อผู้สมัคร */}
           <div>
-            {titleError && (
-              <p className="text-white bg-red inline-block px-4 py-2 rounded-lg text-left mb-2">
-                {titleError}
-              </p>
-            )}
             <label className="block text-lg font-medium text-gray-700 mb-2">
-            ชื่อผู้สมัคร และเบอร์หมายเลข
+              ชื่อผู้สมัคร
             </label>
             <input
-              id="title"
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
               type="text"
-              className="w-full bg-gray-100 border border-gray-300 py-2 px-4 rounded-lg text-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="ป้อนชื่อผู้สมัคร และ เบอร์หมายเลข"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full bg-gray-100 border border-gray-300 py-3 px-4 rounded-lg text-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="ป้อนชื่อผู้สมัคร"
             />
           </div>
 
+          {/* เลขประจำตัว */}
           <div>
-            {imgError && (
-              <p className="text-white bg-red inline-block px-4 py-2 rounded-lg text-left mb-2">
-                {imgError}
-              </p>
-            )}
             <label className="block text-lg font-medium text-gray-700 mb-2">
-            ตัวอย่างรูปภาพ
+              เลขประจำตัว
             </label>
-            {imgPreview && (
-              <div className="my-4">
-                <img
-                  src={imgPreview}
-                  alt="Current Image"
-                  className="w-[250px] h-[250px] object-cover rounded-lg shadow"
-                />
-              </div>
-            )}
-            <div className="relative">
-              <input
-                id="img"
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-              />
+            <input
+              type="text"
+              value={personal_ip}
+              onChange={(e) => setPersonal_ip(e.target.value)}
+              className="w-full bg-gray-100 border border-gray-300 py-3 px-4 rounded-lg text-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="ป้อนเลขประจำตัว"
+            />
+          </div>
+
+          {/* สาขาวิชา */}
+          <div>
+            <label className="block text-lg font-medium text-gray-700 mb-2">
+              สาขาวิชา
+            </label>
+            <select
+              value={department}
+              onChange={(e) => setDepartment(e.target.value)}
+              className="w-full bg-gray-100 border border-gray-300 py-3 px-4 rounded-lg text-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="" disabled>
+                เลือกสาขาวิชา
+              </option>
+              <option value="บัญชี">แผนกวิชาการบัญชี</option>
+              <option value="เลขานุการ">แผนกวิชาการเลขานุการ</option>
+              <option value="การตลาด">แผนกวิชาการตลาด</option>
+              <option value="คอมพิวเตอร์ธุรกิจ">
+                แผนกวิชาคอมพิวเตอร์ธุรกิจและเทคโนโลยีธุรกิจดิจิทัล
+              </option>
+              <option value="โปรแกรมเมอร์">
+                แผนกวิชาคอมพิวเตอร์โปรแกรมเมอร์
+              </option>
+              <option value="กราฟิก">แผนกวิชาคอมพิวเตอร์กราฟิก</option>
+              <option value="ออกแบบ">แผนกวิชาการออกแบบ</option>
+              <option value="โรงแรม">แผนกวิชาการโรงแรม</option>
+              <option value="ท่องเที่ยว">แผนกวิชาการท่องเที่ยว</option>
+              <option value="อาหาร">แผนกวิชาอาหารและโภชนาการ</option>
+              <option value="ผ้าและสื่อสิ่งทอ">แผนกวิชาผ้าและสื่อสิ่งทอ</option>
+              <option value="คหกรรม">แผนกวิชาคหกรรม</option>
+              <option value="ธุรกิจค้าปลีก">แผนกวิชาธุรกิจค้าปลีก</option>
+            </select>
+          </div>
+
+          {/* ระดับชั้น */}
+          <div>
+            <label className="block text-lg font-medium text-gray-700 mb-2">
+              ระดับชั้น
+            </label>
+            <select
+              value={class_room}
+              onChange={(e) => setClass_room(e.target.value)}
+              className="w-full bg-gray-100 border border-gray-300 py-3 px-4 rounded-lg text-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="" disabled>
+                เลือกระดับชั้น
+              </option>
+              <optgroup label="ระดับชั้น ปวช.">
+                <option value="ปวช.1">ปวช. 1</option>
+                <option value="ปวช.2">ปวช. 2</option>
+                <option value="ปวช.3">ปวช. 3</option>
+              </optgroup>
+              <optgroup label="ระดับชั้น ปวส.">
+                <option value="ปวส.1">ปวส. 1</option>
+                <option value="ปวส.2">ปวส. 2</option>
+              </optgroup>
+            </select>
+          </div>
+
+          {/* ผลการเรียน */}
+          <div>
+            <label className="block text-lg font-medium text-gray-700 mb-2">
+              ผลการเรียน
+            </label>
+            <input
+              type="text"
+              value={grade}
+              onChange={(e) => setGrade(e.target.value)}
+              className="w-full bg-gray-100 border border-gray-300 py-3 px-4 rounded-lg text-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="ป้อนผลการเรียน"
+            />
+          </div>
+
+          {/* เบอร์หมายเลข */}
+          <div>
+            <label className="block text-lg font-medium text-gray-700 mb-2">
+              เบอร์หมายเลข
+            </label>
+            <input
+              type="number"
+              value={number_no}
+              onChange={(e) => setNumber(e.target.value)}
+              className="w-full bg-gray-100 border border-gray-300 py-3 px-4 rounded-lg text-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="ป้อนเบอร์หมายเลข"
+            />
+          </div>
+
+          {/* รูปผลงานผู้สมัคร */}
+          <div>
+            <label className="block text-lg font-medium text-gray-700 mb-2">
+              รูปผลงานผู้สมัคร
+            </label>
+            <div className="flex items-center space-x-4">
               <label
-                htmlFor="img"
-                className="bg-blue-500 text-white py-2 px-4 rounded-lg inline-block cursor-pointer hover:bg-blue-600 transition duration-200"
+                htmlFor="file-input_1"
+                className="bg-blue-500 text-white py-2 px-4 rounded-lg cursor-pointer hover:bg-blue-600 transition duration-200"
               >
                 เลือกรูป
               </label>
-              <span className="ml-3 text-gray-500">
-                {newImg ? newImg.name : oldImgName}
-              </span>
+              <input
+                id="file-input_1"
+                type="file"
+                onChange={handleImgwork}
+                className="hidden"
+              />
+              <span className="text-gray-600">{fileName_work}</span>
             </div>
           </div>
 
-          <div>
-            {numberNoError && (
-              <p className="text-white bg-red inline-block px-4 py-2 rounded-lg text-left mb-2">
-                {numberNoError}
+          {preview_work && (
+            <div className="mt-4">
+              <p className="text-lg font-medium text-gray-700 mb-2">
+                ตัวอย่างรูปภาพ
               </p>
-            )}
+              <img
+                src={preview_work}
+                alt="Image preview"
+                className="w-[250px] h-[250px] object-cover rounded-lg shadow"
+              />
+            </div>
+          )}
+
+          {/* รูปผู้สมัคร */}
+          <div>
             <label className="block text-lg font-medium text-gray-700 mb-2">
-            เบอร์หมายเลข
+              รูปผู้สมัคร
             </label>
-            <input
-              id="number_no"
-              type="number"
-              value={newNumber_no}
-              onChange={(e) => setNewNumber_no(e.target.value)}
-              className="w-full bg-gray border border-gray py-2 px-4 rounded-lg text-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-               placeholder="ป้อนเบอร์หมายเลข"
+            <div className="flex items-center space-x-4">
+              <label
+                htmlFor="file-input_2"
+                className="bg-blue-500 text-white py-2 px-4 rounded-lg cursor-pointer hover:bg-blue-600 transition duration-200"
+              >
+                เลือกรูป
+              </label>
+              <input
+                id="file-input_2"
+                type="file"
+                onChange={handleImgChange}
+                className="hidden"
+              />
+              <span className="text-gray-600">{fileName_profile}</span>
+            </div>
+          </div>
+
+          {preview_profile && (
+            <div className="mt-4">
+              <p className="text-lg font-medium text-gray-700 mb-2">
+                ตัวอย่างรูปภาพ
+              </p>
+              <img
+                src={preview_profile}
+                alt="Image preview"
+                className="w-[250px] h-[250px] object-cover rounded-lg shadow"
+              />
+            </div>
+          )}
+
+          {/* นโยบายพรรค */}
+          <div>
+            <label className="block text-lg font-medium text-gray-700 mb-2">
+              นโยบายพรรค
+            </label>
+            <textarea
+              value={party_policies}
+              onChange={(e) => setParty_policies(e.target.value)}
+              rows="5"
+              className="block p-4 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="ป้อนนโยบายพรรค"
             />
           </div>
 
+          {/* ข้อมูลพรรค */}
+          <div>
+            <label className="block text-lg font-medium text-gray-700 mb-2">
+              ข้อมูลพรรค
+            </label>
+            <textarea
+              value={party_details}
+              onChange={(e) => setParty_details(e.target.value)}
+              rows="5"
+              className="block p-4 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="ป้อนข้อมูลพรรค"
+            />
+          </div>
+
+          {/* ปุ่มส่งข้อมูล */}
           <div className="flex justify-between">
             <button
               type="submit"
-              className="bg-green-500 hover:bg-green-600 text-white border py-2 px-4 rounded text-lg"
+              className="bg-green-500 hover:bg-green-600 text-white border py-3 px-6 rounded text-lg"
             >
-              แก้ไขข้อมูลผู้สมัคร
+              แก้ไขผู้สมัคร
             </button>
             <Link
               href="/admin/management"
-              className="bg-red hover:bg-red-600 text-white border py-2 px-4 rounded text-lg"
+              className="bg-red hover:bg-red-600 text-white border py-3 px-6 rounded text-lg"
             >
               ย้อนกลับ
             </Link>
