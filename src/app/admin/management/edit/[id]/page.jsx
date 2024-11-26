@@ -89,8 +89,8 @@ function EditPostPage({ params }) {
     formData.append("party_policies", party_policies);
     formData.append("party_details", party_details);
 
-    if (newImg) formData.append("profile_image", newImg);
-    if (newWorkImg) formData.append("work_image", newWorkImg);
+    if (newImg) formData.append("img_profile", newImg);
+    if (newWorkImg) formData.append("img_work", newWorkImg);
 
     try {
       const res = await fetch(`/api/election/${id}`, {

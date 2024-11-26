@@ -12,6 +12,7 @@ export async function POST(req) {
     const name = formData.get("name");
     const personal_ip = formData.get("personal_ip");
     const img_profile = formData.get("img_profile");
+    const grade = formData.get("grade");
     const number_no = formData.get("number_no");
     const department = formData.get("department");
     const class_room = formData.get("class_room");
@@ -23,6 +24,7 @@ export async function POST(req) {
       !name ||
       !personal_ip ||
       !img_profile ||
+      !grade ||
       !number_no ||
       !department ||
       !class_room ||
@@ -37,8 +39,8 @@ export async function POST(req) {
 
     // คำนวณลำดับ ID โดยนับจำนวนเอกสารในฐานข้อมูล
     const postCount = await Post.countDocuments({});
-    const profileFilename = `P${(postCount + 1).toString().padStart(11, "0")}`;
-    const workFilename = `W${(postCount + 1).toString().padStart(11, "0")}`;
+    const profileFilename = `P${(Date.now()).toString().padStart(11, "0")}`;  // ใช้ timestamp สำหรับชื่อไฟล์โปรไฟล์
+    const workFilename = `W${(Date.now()).toString().padStart(11, "0")}`;  // ใช้ timestamp สำหรับชื่อไฟล์งาน
 
     // ดึงนามสกุลไฟล์จาก input (เช่น .jpg, .png)
     const profileExt = path.extname(img_profile.name).toLowerCase(); // นามสกุลไฟล์ของ img_profile
@@ -71,6 +73,7 @@ export async function POST(req) {
       name,
       personal_ip,
       img_profile: profileFileWithExt,
+      grade,
       number_no,
       department,
       class_room,
