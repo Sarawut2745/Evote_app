@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+
 function CreatePostPage() {
   const [name, setName] = useState("");
   const [personal_ip, setPersonal_ip] = useState("");
