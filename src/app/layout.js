@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata = {
   title: "ระบบเลือกตั้ง",
   icons: {
-    icon: "/images/logo.png",
+    icon: "/logo.png",
   },
 };
 
