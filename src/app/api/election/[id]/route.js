@@ -29,7 +29,9 @@ export async function PUT(req, { params }) {
   try {
     const formData = await req.formData();
     const name = formData.get("name");
+    const lastname = formData.get("lastname");
     const personal_ip = formData.get("personal_ip");
+    const grade = formData.get("grade");
     const img_profile = formData.get("img_profile");
     const number_no = formData.get("number_no");
     const department = formData.get("department");
@@ -38,9 +40,24 @@ export async function PUT(req, { params }) {
     const party_details = formData.get("party_details");
     const img_work = formData.get("img_work");
 
+    // Log all received form data to verify
+    console.log("Received form data:", {
+      name,
+      lastname,
+      personal_ip,
+      grade,
+      number_no,
+      department,
+      class_room,
+      party_policies,
+      party_details
+    });
+
     if (
       !name ||
+      !lastname ||
       !personal_ip ||
+      !grade ||
       !number_no ||
       !department ||
       !class_room ||
@@ -125,7 +142,9 @@ export async function PUT(req, { params }) {
       id,
       {
         name,
+        lastname,
         personal_ip,
+        grade,
         img_profile: profileImgFilename,
         img_work: workImgFilename,
         number_no,
@@ -136,6 +155,8 @@ export async function PUT(req, { params }) {
       },
       { new: true }
     );
+
+    console.log("Data saved:", updatedPost);
 
     return NextResponse.json({
       message: "Post updated successfully",

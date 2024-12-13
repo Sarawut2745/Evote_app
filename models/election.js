@@ -2,16 +2,17 @@ import mongoose, { Schema } from "mongoose";
 
 const ElectionSchema = new Schema(
     {
-        name: String,
-        personal_ip: Number,
-        department: String,
-        class_room: String,
-        grade: Number,
-        img_work: String,
-        img_profile: String,
-        party_policies: String,
-        party_details: String,
-        number_no: Number,
+        name: { type: String, required: true },
+        lastname: { type: String, required: true },
+        personal_ip: { type: Number, required: true },
+        department: { type: String, required: true },
+        class_room: { type: String, required: true },
+        grade: { type: Number, required: true },
+        img_work: { type: String, required: true },
+        img_profile: { type: String, required: true },
+        party_policies: { type: String, required: true },
+        party_details: { type: String, required: true },
+        number_no: { type: Number, required: true }
     },
     {
         timestamps: true

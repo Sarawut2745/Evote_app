@@ -78,7 +78,7 @@ function Navbar() {
                 className="btn btn-error text-white border py-2 px-3 rounded-md text-lg shadow-md"
                 aria-label="Logout"
               >
-                Logout
+                ออกจากระบบ
               </button>
             </li>
           </>

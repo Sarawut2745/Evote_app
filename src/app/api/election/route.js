@@ -10,6 +10,7 @@ export async function POST(req) {
   try {
     const formData = await req.formData();
     const name = formData.get("name");
+    const lastname = formData.get("lastname");
     const personal_ip = formData.get("personal_ip");
     const img_profile = formData.get("img_profile");
     const grade = formData.get("grade");
@@ -20,8 +21,10 @@ export async function POST(req) {
     const party_details = formData.get("party_details");
     const img_work = formData.get("img_work");
 
+    // Check for missing fields
     if (
       !name ||
+      !lastname ||
       !personal_ip ||
       !img_profile ||
       !grade ||
@@ -32,28 +35,54 @@ export async function POST(req) {
       !party_details ||
       !img_work
     ) {
-      return NextResponse.json({ message: "Missing fields", status: 400 });
+      return NextResponse.json({ 
+        message: "Missing fields", 
+        missingFields: {
+          name: !name,
+          lastname: !lastname,
+          personal_ip: !personal_ip,
+          img_profile: !img_profile,
+          grade: !grade,
+          number_no: !number_no,
+          department: !department,
+          class_room: !class_room,
+          party_policies: !party_policies,
+          party_details: !party_details,
+          img_work: !img_work
+        },
+        status: 400 
+      });
     }
 
+    // Convert numeric fields to numbers
+    const personal_ipNumber = Number(personal_ip);
+    const gradeNumber = Number(grade);
+    const number_noNumber = Number(number_no);
+
+    if (isNaN(personal_ipNumber) || isNaN(gradeNumber) || isNaN(number_noNumber)) {
+      return NextResponse.json({ message: "Invalid number format", status: 400 });
+    }
+
+    // Connect to MongoDB
     await connectMongoDB();
 
-    // คำนวณลำดับ ID โดยนับจำนวนเอกสารในฐานข้อมูล
-    const postCount = await Post.countDocuments({});
-    const profileFilename = `P${(Date.now()).toString().padStart(11, "0")}`;  // ใช้ timestamp สำหรับชื่อไฟล์โปรไฟล์
-    const workFilename = `W${(Date.now()).toString().padStart(11, "0")}`;  // ใช้ timestamp สำหรับชื่อไฟล์งาน
+    // Generate unique filenames using timestamp
+    const profileFilename = `P${(Date.now()).toString().padStart(11, "0")}`;
+    const workFilename = `W${(Date.now()).toString().padStart(11, "0")}`;
 
-    // ดึงนามสกุลไฟล์จาก input (เช่น .jpg, .png)
-    const profileExt = path.extname(img_profile.name).toLowerCase(); // นามสกุลไฟล์ของ img_profile
-    const workExt = path.extname(img_work.name).toLowerCase(); // นามสกุลไฟล์ของ img_work
+    // Get file extensions
+    const profileExt = path.extname(img_profile.name).toLowerCase();
+    const workExt = path.extname(img_work.name).toLowerCase();
 
-    // สร้างชื่อไฟล์ใหม่พร้อมนามสกุล
-    const profileFileWithExt = profileFilename + profileExt; // เช่น P00000000001.jpg
-    const workFileWithExt = workFilename + workExt; // เช่น W00000000001.png
+    // Create full filenames with extensions
+    const profileFileWithExt = profileFilename + profileExt;
+    const workFileWithExt = workFilename + workExt;
 
+    // Convert image buffers
     const profileBuffer = Buffer.from(await img_profile.arrayBuffer());
     const workBuffer = Buffer.from(await img_work.arrayBuffer());
 
-    // บันทึกไฟล์ในโฟลเดอร์
+    // Save profile image
     await writeFile(
       path.join(
         process.cwd(),
@@ -63,18 +92,20 @@ export async function POST(req) {
       profileBuffer
     );
 
+    // Save work image
     await writeFile(
       path.join(process.cwd(), "public/assets/election/work", workFileWithExt),
       workBuffer
     );
 
-    // สร้างข้อมูลในฐานข้อมูล
-    await Post.create({
+    // Create database entry
+    const savedPost = await Post.create({
       name,
-      personal_ip,
+      lastname, // Explicitly include lastname
+      personal_ip: personal_ipNumber,
       img_profile: profileFileWithExt,
-      grade,
-      number_no,
+      grade: gradeNumber,
+      number_no: number_noNumber,
       department,
       class_room,
       party_policies,
@@ -85,10 +116,15 @@ export async function POST(req) {
     return NextResponse.json({ message: "Success", status: 201 });
   } catch (error) {
     console.error("Error occurred:", error);
-    return NextResponse.json({ message: "Failed", status: 500 });
+    return NextResponse.json({ 
+      message: "Failed", 
+      error: error.message, 
+      status: 500 
+    });
   }
 }
 
+// GET and DELETE functions remain the same as in the original code
 export async function GET() {
   await connectMongoDB();
   const posts = await Post.find({});
@@ -104,33 +140,34 @@ export async function DELETE(req) {
 
     await connectMongoDB();
 
-    // ค้นหา Post โดย ID
+    // Find the post by ID
     const post = await Post.findById(id);
 
     if (!post) {
       return NextResponse.json({ message: "Post not found" }, { status: 404 });
     }
 
-    // ลบ Post จากฐานข้อมูล
+    // Delete the post from the database
     await Post.findByIdAndDelete(id);
 
-    // ลบข้อมูลคะแนนที่เกี่ยวข้อง
+    // Delete related scores
     await Scores.deleteMany({ number_no: post.number_no });
 
-    // ลบไฟล์รูปภาพ
+    // Delete profile image
     const imgProfilePath = path.join(
       process.cwd(),
       "public/assets/election/profile",
       post.img_profile
     );
 
+    // Delete work image
     const imgWorkPath = path.join(
       process.cwd(),
       "public/assets/election/work",
       post.img_work
     );
 
-    // ลบไฟล์โปรไฟล์
+    // Try to delete profile image file
     try {
       await unlink(imgProfilePath);
       console.log(`Profile image file ${imgProfilePath} deleted successfully`);
@@ -141,7 +178,7 @@ export async function DELETE(req) {
       );
     }
 
-    // ลบไฟล์งาน
+    // Try to delete work image file
     try {
       await unlink(imgWorkPath);
       console.log(`Work image file ${imgWorkPath} deleted successfully`);

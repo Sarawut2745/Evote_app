@@ -96,15 +96,15 @@ export default function Home() {
                   key={val._id}
                   className="shadow-md p-4 rounded-xl flex flex-col items-center bg-white"
                 >
-                  <h4 className="text-lg md:text-xl mb-3">{val.title}</h4>
+                  <h4 className="text-lg md:text-xl mb-3">{val.name}</h4>
                   <div className="flex justify-center w-full mb-3">
                     <Image
                       className="rounded-md"
-                      src={`/assets/${val.img}`}
+                      src={`/assets/election/profile/${val.img_profile}`}
                       width={200}
                       height={200}
-                      alt={val.title}
-                      objectFit="cover"
+                      alt={val.name}
+                      style={{ objectFit: "cover" }}
                     />
                   </div>
                   <button

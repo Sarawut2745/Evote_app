@@ -14,7 +14,7 @@ export async function GET(req) {
 
     // Use regex to find posts that match the query in the title field
     const posts = await Post.find({
-      title: { $regex: searchQuery, $options: "i" }, // Case-insensitive search
+      name: { $regex: searchQuery, $options: "i" }, // Case-insensitive search
     });
 
     return NextResponse.json({ posts }, { status: 200 });

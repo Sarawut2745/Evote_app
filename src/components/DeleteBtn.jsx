@@ -23,7 +23,8 @@ function DeleteBtn({ id }) {
     <>
       <a
         onClick={() => setIsModalOpen(true)}
-        className="btn bg-red rounded shadow-sm border-red py-1 px-3 cursor-pointer"
+        className="btn bg-error hover:bg-error text-white py-1 px-3 rounded-lg shadow-sm transition duration-150 ease-in-out border border-base-content"
+
       >
         <FontAwesomeIcon icon={faTrash} className="text-white" />
       </a>
@@ -46,7 +47,7 @@ function DeleteBtn({ id }) {
                 onClick={() => setIsModalOpen(false)}
                 className="bg-success text-gray py-2 px-4 rounded mr-2 transition-colors duration-200 ease-in-out hover:bg-success"
               >
-                Cancel
+                ยกเลิก
               </button>
               <button
                 onClick={() => {
@@ -55,7 +56,7 @@ function DeleteBtn({ id }) {
                 }}
                 className="bg-red text-white py-2 px-4 rounded transition-colors duration-200 ease-in-out hover:bg-red"
               >
-                Delete
+                ยืนยัน
               </button>
             </div>
           </div>
