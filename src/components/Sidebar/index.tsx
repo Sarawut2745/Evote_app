@@ -9,7 +9,7 @@ import ClickOutside from "../../components/ClickOutside";
 import useLocalStorage from "../../hooks/useLocalStorage";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTachometerAlt, faCog } from '@fortawesome/free-solid-svg-icons';
+import { faTachometerAlt, faCog,  faImage} from '@fortawesome/free-solid-svg-icons';
 
 
 interface SidebarProps {
@@ -23,6 +23,7 @@ const menuGroups = [
     menuItems: [ 
       { icon: (<FontAwesomeIcon icon={faTachometerAlt} />), label: "แผนควบคุม", route: "/admin", }, 
       { icon: (<FontAwesomeIcon icon={faCog} />), label: "การจัดการ", route: "/admin/management", },
+      { icon: (<FontAwesomeIcon icon={faImage} />), label: "จัดการรูป", route: "/admin/background" }
     ],
   },
 ];
