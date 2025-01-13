@@ -28,7 +28,7 @@ const DeleteModal = memo(({ isOpen, onClose, onConfirm }) => {
           </button>
           <button
             onClick={onConfirm}
-            className="bg-red-600 text-white py-2 px-4 rounded transition-colors duration-200 ease-in-out hover:bg-red-700"
+            className="bg-red text-white py-2 px-4 rounded transition-colors duration-200 ease-in-out hover:bg-red"
           >
             ยืนยัน
           </button>
@@ -65,7 +65,7 @@ const BannerItem = memo(({ background, index, onDeleteClick }) => (
         onClick={() => onDeleteClick(background._id)}
         className="ml-4 text-red-600 hover:text-red-800 transition-colors"
       >
-        <FontAwesomeIcon icon={faTrashAlt} className="text-lg" />
+        <FontAwesomeIcon icon={faTrashAlt} className="text-lg text-red"/>
       </button>
     </td>
   </tr>
@@ -90,7 +90,7 @@ function Background() {
         cache: "no-store",
       });
 
-      if (!res.ok) throw new Error("Failed to fetch Banner");
+      if (!res.ok) throw new Error("ดึงรูปภาพไม่สำเร็จ");
 
       const data = await res.json();
       setBackgroundData(data.background);
@@ -104,7 +104,7 @@ function Background() {
 
   const handleDelete = useCallback(async () => {
     if (!deleteId) {
-      setError("ID not provided for deletion.");
+      setError("ไม่มีรูป");
       return;
     }
 
@@ -113,7 +113,7 @@ function Background() {
         method: "DELETE",
       });
 
-      if (!res.ok) throw new Error("Failed to delete Banner");
+      if (!res.ok) throw new Error("ลบรูปภาพไม่สำเร็จ");
 
       setBackgroundData(prev => prev.filter(item => item._id !== deleteId));
       setIsModalOpen(false);
