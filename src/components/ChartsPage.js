@@ -7,15 +7,15 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarEle
 const ChartsPage = () => {
   const [userTypeCounts, setUserTypeCounts] = useState([]);
   const [numberNoCounts, setNumberNoCounts] = useState([]);
-  const [totalDocumentCount, setTotalDocumentCount] = useState(0);  
+  const [totalDocumentCount, setTotalDocumentCount] = useState(0);
 
   useEffect(() => {
     const fetchCounts = async () => {
-      const response = await fetch('/api/scores'); 
+      const response = await fetch('/api/scores');
       const data = await response.json();
       setUserTypeCounts(data.userTypeCounts);
       setNumberNoCounts(data.numberNoCounts);
-      setTotalDocumentCount(data.totalDocumentCount);  
+      setTotalDocumentCount(data.totalDocumentCount);
     };
 
     fetchCounts();
@@ -101,9 +101,41 @@ const ChartsPage = () => {
           <div className="bg-white shadow-md rounded-lg p-6">
             <h2 className="text-xl font-semibold text-gray-800 text-center mb-4">คะแนน ผู้สมัคร</h2>
             <div className="h-96">
-              <Bar data={barData} options={{ responsive: true, maintainAspectRatio: false }} />
+              <Bar
+                data={barData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  scales: {
+                    x: {
+                      title: {
+                        display: true,
+                        text: 'เบอร์สมัคร', // ชื่อแกน X
+                        color: '#333',
+                        font: {
+                          size: 16,
+                          weight: 'bold',
+                        },
+                      },
+                    },
+                    y: {
+                      title: {
+                        display: true,
+                        text: 'จำนวนคนที่เลือก', // ชื่อแกน Y
+                        color: '#333',
+                        font: {
+                          size: 16,
+                          weight: 'bold',
+                        },
+                      },
+                      beginAtZero: true, // เริ่มจาก 0
+                    },
+                  },
+                }}
+              />
             </div>
           </div>
+
         </div>
       </div>
     </div>

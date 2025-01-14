@@ -331,8 +331,8 @@ const config: Config = {
     },
   },
   plugins: [
-    require('daisyui'),
-    require('flowbite/plugin')
+   /*  require('daisyui'),
+    require('flowbite/plugin') */
   ],
 };
 export default config;

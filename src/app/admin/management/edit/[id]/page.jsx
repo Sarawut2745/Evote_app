@@ -374,7 +374,7 @@ function EditPostPage({ params }) {
               className="bg-green-500 hover:bg-green-600 text-white border py-3 px-6 rounded text-lg"
             >
               แก้ไขผู้สมัคร
-            </button>
+            </button> 
             <Link
               href="/admin/management"
               className="bg-red hover:bg-red-600 text-white border py-3 px-6 rounded text-lg"

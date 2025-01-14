@@ -23,7 +23,7 @@ const menuGroups = [
     menuItems: [ 
       { icon: (<FontAwesomeIcon icon={faTachometerAlt} />), label: "แผนควบคุม", route: "/admin", }, 
       { icon: (<FontAwesomeIcon icon={faCog} />), label: "การจัดการ", route: "/admin/management", },
-      { icon: (<FontAwesomeIcon icon={faImage} />), label: "จัดการรูป", route: "/admin/background" }
+      /* { icon: (<FontAwesomeIcon icon={faImage} />), label: "จัดการรูป", route: "/admin/background" } */
     ],
   },
 ];

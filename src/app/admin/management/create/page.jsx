@@ -104,7 +104,7 @@ function CreatePostPage() {
     <div className="container mx-auto py-12 px-6">
       <div className="max-w-3xl mx-auto bg-white p-10 rounded-lg shadow-md">
         <h3 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-          แก้ไขข้อมูลผู้สมัคร
+          เพิ่มข้อมูลผู้สมัคร
         </h3>
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -321,7 +321,7 @@ function CreatePostPage() {
                     width={200}
                     height={200}
                     className="object-cover rounded-lg shadow mx-auto"
-                  />
+                  />  
                 </div>
               )}
             </div>
@@ -360,7 +360,7 @@ function CreatePostPage() {
               type="submit"
               className="bg-green-500 hover:bg-green-600 text-white border py-3 px-6 rounded text-lg"
             >
-              แก้ไขผู้สมัคร
+              เพิ่มผู้สมัคร
             </button>
             <Link
               href="/admin/management"

@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faPlus } from "@fortawesome/free-solid-svg-icons";
-import DeleteBtn from "../DeleteBtn";
-import Image from 'next/image';
+import { faEdit, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+import Image from "next/image";
 
 export default function Management() {
   const [postData, setPostData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+  const [isClosing, setIsClosing] = useState(false);
 
-  // Function to fetch all posts
   const getPosts = async () => {
     setLoading(true);
-    setError(""); // Reset error state on retry
+    setError("");
     try {
       const res = await fetch("/api/election", {
         cache: "no-store",
@@ -41,10 +41,9 @@ export default function Management() {
   }, []);
 
   useEffect(() => {
-    
     const timeoutId = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
-    }, 500); 
+    }, 500);
 
     return () => clearTimeout(timeoutId);
   }, [searchQuery]);
@@ -53,7 +52,7 @@ export default function Management() {
     if (debouncedSearchQuery) {
       handleSearch();
     } else {
-      getPosts(); 
+      getPosts();
     }
   }, [debouncedSearchQuery]);
 
@@ -74,6 +73,31 @@ export default function Management() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDelete = async (id) => {
+    const res = await fetch(`/api/election?id=${id}`, {
+      method: "DELETE",
+    });
+
+    if (res.ok) {
+      setModalOpen(false);
+      getPosts();
+    }
+  };
+
+  const closeModal = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setIsClosing(false);
+      setModalOpen(false);
+      setSelectedId(null);
+    }, 300); // Match animation timing
+  };
+
+  const openModal = (id) => {
+    setSelectedId(id);
+    setModalOpen(true);
   };
 
   const handleReset = () => {
@@ -119,7 +143,7 @@ export default function Management() {
         {loading ? (
           <div className="py-4 text-center text-gray-500">กำลังโหลด...</div>
         ) : error ? (
-          <div className="py-4 text-center text-red-500">{error}</div>
+          <div className="py-4 text-center text-red">{error}</div>
         ) : (
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-100">
@@ -136,9 +160,7 @@ export default function Management() {
               {postData.length > 0 ? (
                 postData.map((post, index) => (
                   <tr key={post._id}>
-                    <td className="text-gray-700 text-center py-2 px-4">
-                      {index + 1}
-                    </td>
+                    <td className="text-gray-700 text-center py-2 px-4">{index + 1}</td>
                     <td className="text-center py-2 px-4">
                       <Image
                         src={`/assets/election/profile/${post.img_profile}`}
@@ -159,7 +181,12 @@ export default function Management() {
                         >
                           <FontAwesomeIcon icon={faEdit} />
                         </Link>
-                        <DeleteBtn id={post._id} />
+                        <button
+                          onClick={() => openModal(post._id)}
+                          className="btn bg-red hover:bg-red text-white py-1 px-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -175,6 +202,37 @@ export default function Management() {
           </table>
         )}
       </div>
+
+      {modalOpen && (
+        <div
+          className={`fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50 
+            transition-opacity duration-300 ease-in-out ${isClosing ? "opacity-0" : "opacity-100"}`}
+          onClick={closeModal}
+        >
+          <div
+            className={`bg-white p-8 rounded-lg shadow-lg max-w-lg w-full transform transition-transform duration-300 
+              ease-in-out ${isClosing ? "scale-95 opacity-0" : "scale-100 opacity-100"}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-xl font-bold mb-4">ยืนยันการลบ</h2>
+            <p className="mb-4 text-lg">คุณแน่ใจหรือไม่ว่าต้องการลบผู้สมัครนี้?</p>
+            <div className="flex justify-end">
+            <button
+                onClick={closeModal}
+                className="btn bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg mr-2"
+              >
+                ยกเลิก
+              </button>
+              <button
+                onClick={() => handleDelete(selectedId)}
+                className="btn bg-red hover:bg-red text-white py-2 px-4 rounded-lg"
+              >
+                ลบ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
