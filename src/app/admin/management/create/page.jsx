@@ -3,8 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Image from 'next/image';
-
+import NextImage from "next/image";
 
 function CreatePostPage() {
   const [name, setName] = useState("");
@@ -29,10 +28,19 @@ function CreatePostPage() {
 
   const handleImgChange = (e) => {
     const file = e.target.files[0];
-    setImg_profile(file);
     if (file) {
-      setPreview_profile(URL.createObjectURL(file));
-      setFileName_profile(file.name);
+      // ตรวจสอบขนาดไฟล์ภาพ
+      const img = new Image();
+      img.onload = () => {
+        if (img.width <= 200 && img.height <= 200) {
+          setImg_profile(file);
+          setPreview_profile(URL.createObjectURL(file));
+          setFileName_profile(file.name);
+        } else {
+          alert("ขนาดรูปภาพต้องไม่เกิน 200x200 พิกเซล");
+        }
+      };
+      img.src = URL.createObjectURL(file);
     } else {
       setPreview_profile(null);
       setFileName_profile("โปรดเลือกรูป");
@@ -41,10 +49,19 @@ function CreatePostPage() {
 
   const handleImgwork = (e) => {
     const file = e.target.files[0];
-    setImg_work(file);
     if (file) {
-      setPreview_work(URL.createObjectURL(file));
-      setFileName_work(file.name);
+      // ตรวจสอบขนาดไฟล์ภาพ
+      const img = new Image();
+      img.onload = () => {
+        if (img.width <= 320 && img.height <= 200) {
+          setImg_work(file);
+          setPreview_work(URL.createObjectURL(file));
+          setFileName_work(file.name);
+        } else {
+          alert("ขนาดรูปภาพต้องไม่เกิน 320x200 พิกเซล");
+        }
+      };
+      img.src = URL.createObjectURL(file);
     } else {
       setPreview_work(null);
       setFileName_work("โปรดเลือกรูป");
@@ -82,7 +99,6 @@ function CreatePostPage() {
     formData.append("party_policies", party_policies);
     formData.append("party_details", party_details);
     formData.append("img_work", img_work);
-
 
     try {
       const res = await fetch("/api/election", {
@@ -177,7 +193,9 @@ function CreatePostPage() {
                 <option value="โรงแรม">แผนกวิชาการโรงแรม</option>
                 <option value="ท่องเที่ยว">แผนกวิชาการท่องเที่ยว</option>
                 <option value="อาหาร">แผนกวิชาอาหารและโภชนาการ</option>
-                <option value="ผ้าและสื่อสิ่งทอ">แผนกวิชาผ้าและสื่อสิ่งทอ</option>
+                <option value="ผ้าและสื่อสิ่งทอ">
+                  แผนกวิชาผ้าและสื่อสิ่งทอ
+                </option>
                 <option value="คหกรรม">แผนกวิชาคหกรรม</option>
                 <option value="ธุรกิจค้าปลีก">แผนกวิชาธุรกิจค้าปลีก</option>
               </select>
@@ -264,7 +282,12 @@ function CreatePostPage() {
                     onChange={handleImgwork}
                     className="hidden"
                   />
-                  <span className="text-gray-600 truncate" style={{ maxWidth: '150px' }}>{fileName_work || "ยังไม่ได้เลือกไฟล์"}</span>
+                  <span
+                    className="text-gray-600 truncate"
+                    style={{ maxWidth: "150px" }}
+                  >
+                    {fileName_work || "ยังไม่ได้เลือกไฟล์"}
+                  </span>
                 </div>
               </div>
 
@@ -286,7 +309,12 @@ function CreatePostPage() {
                     onChange={handleImgChange}
                     className="hidden"
                   />
-                  <span className="text-gray-600 truncate" style={{ maxWidth: '150px' }}>{fileName_profile || "ยังไม่ได้เลือกไฟล์"}</span>
+                  <span
+                    className="text-gray-600 truncate"
+                    style={{ maxWidth: "150px" }}
+                  >
+                    {fileName_profile || "ยังไม่ได้เลือกไฟล์"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -299,10 +327,10 @@ function CreatePostPage() {
                   <p className="text-lg font-medium text-gray-700 mb-2">
                     ตัวอย่างรูปผลงานผู้สมัคร
                   </p>
-                  <Image
+                  <NextImage
                     src={preview_work}
                     alt="ตัวอย่างรูปผลงานผู้สมัคร"
-                    width={200}
+                    width={320}
                     height={200}
                     className="object-cover rounded-lg shadow mx-auto"
                   />
@@ -315,13 +343,13 @@ function CreatePostPage() {
                   <p className="text-lg font-medium text-gray-700 mb-2">
                     ตัวอย่างรูปผู้สมัคร
                   </p>
-                  <Image
+                  <NextImage
                     src={preview_profile}
                     alt="ตัวอย่างรูปผู้สมัคร"
                     width={200}
                     height={200}
                     className="object-cover rounded-lg shadow mx-auto"
-                  />  
+                  />
                 </div>
               )}
             </div>

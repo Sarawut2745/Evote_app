@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { CSSTransition } from 'react-transition-group';
-import '../css/CustomModal.css';
+
 
 const CustomModal = ({ isOpen, onClose, onConfirm }) => {
   const modalRef = useRef(null); // Create a ref for the modal div
@@ -15,7 +15,7 @@ const CustomModal = ({ isOpen, onClose, onConfirm }) => {
     >
       <div ref={modalRef} className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white p-6 rounded-lg shadow-lg w-1/4 max-w-md transform transition-transform duration-300">
-          <h2 className="text-2xl font-semibold mb-4">ยืนยันการลงคะแนน</h2>
+          <h2 className="text-2xl font-semฃibold mb-4">ยืนยันการลงคะแนน</h2>
           <p className="mb-6">คุณแน่ใจหรือไม่ว่าต้องการลงคะแนนนี้?</p>
           <div className="flex justify-end space-x-4">
             <button
