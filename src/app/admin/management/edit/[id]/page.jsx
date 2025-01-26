@@ -210,13 +210,13 @@ function EditPostPage({ params }) {
                   เลือกระดับชั้น
                 </option>
                 <optgroup label="ระดับชั้น ปวช.">
-                  <option value="ปวช.1">ปวช. 1</option>
-                  <option value="ปวช.2">ปวช. 2</option>
-                  <option value="ปวช.3">ปวช. 3</option>
+                  <option value="ปวช.1">ปวช.1</option>
+                  <option value="ปวช.2">ปวช.2</option>
+                  <option value="ปวช.3">ปวช.3</option>
                 </optgroup>
                 <optgroup label="ระดับชั้น ปวส.">
-                  <option value="ปวส.1">ปวส. 1</option>
-                  <option value="ปวส.2">ปวส. 2</option>
+                  <option value="ปวส.1">ปวส.1</option>
+                  <option value="ปวส.2">ปวส.2</option>
                 </optgroup>
               </select>
             </div>

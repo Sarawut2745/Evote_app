@@ -6,6 +6,10 @@ const userSchema = new Schema(
             type: String,
             required: true
         },
+        posonal_number: {
+            type: String,  // Ensure the field type is correct
+            required: true  // Make sure it's required if that's the case
+        },
         user_type: {
             type: String,
         },
@@ -17,6 +21,7 @@ const userSchema = new Schema(
     },
     { timestamps: true }
 )
+
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);
 export default User;

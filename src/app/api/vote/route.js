@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server';
 import { connectMongoDB } from '../../../../lib/mongodb';
 import Scores from '../../../../models/scores_el';
 import User from '../../../../models/user';
-import { signOut, useSession } from "next-auth/react";
 
 export async function POST(req) {
   try {
-   
     const { user_type, number_no } = await req.json();
+
+    console.log(number_no)
 
     await connectMongoDB();
     await Scores.create({ user_type, number_no });

@@ -7,26 +7,52 @@ const authOptions = {
   providers: [
     CredentialsProvider({
       name: "credentials",
-      credentials: {},
+      credentials: {
+        name: { label: "Username", type: "text" },
+        posonal_number: { label: "Posonal Number", type: "password" }
+      },
       async authorize(credentials) {
-        const { name } = credentials;
+        const { name, posonal_number } = credentials;
+
+        // ตรวจสอบว่า credentials ถูกส่งมาอย่างถูกต้องหรือไม่
+        if (!name || !posonal_number) {
+          console.error("Username or posonal_number is missing");
+          return null;
+        }
 
         try {
           await connectMongoDB();
+
+          // ค้นหาผู้ใช้จากชื่อ
           const user = await User.findOne({ name });
 
+          // ถ้าหากไม่พบผู้ใช้ ให้คืนค่า null
           if (!user) {
+            console.error("User not found");
             return null;
           }
 
+          // ตรวจสอบว่ามี posonal_number ในฐานข้อมูล
+          if (!user.posonal_number) {
+            console.error("Posonal number missing in database");
+            return null;
+          }
+
+          // ตรวจสอบว่า posonal_number ตรงกับที่ฐานข้อมูลหรือไม่
+          if (posonal_number !== user.posonal_number) {
+            console.error("Invalid posonal_number");
+            return null;
+          }
+
+          // คืนค่าข้อมูลผู้ใช้
           return {
             id: user._id,
             name: user.name,
             role: user.role,
-            user_type: user.user_type, 
+            user_type: user.user_type,
           };
         } catch (error) {
-          console.log("Error: ", error);
+          console.error("Authentication error:", error);
           return null;
         }
       },
@@ -37,8 +63,8 @@ const authOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
-    signIn: "/login", // หน้าเข้าสู่ระบบ
-    signOut: "/login", // หน้าออกจากระบบ
+    signIn: "/login",
+    signOut: "/login",
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -64,11 +90,11 @@ const authOptions = {
       };
     },
     async redirect({ url, baseUrl }) {
-      if (url === '/api/auth/signout') {
-        return baseUrl; // เปลี่ยนเส้นทางหลังการล็อกเอ้าท์
+      if (url === "/api/auth/signout") {
+        return baseUrl;
       }
       return url.startsWith(baseUrl) ? url : baseUrl;
-    }
+    },
   },
 };
 

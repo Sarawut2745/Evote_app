@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
@@ -9,14 +9,16 @@ import { useSession } from "next-auth/react";
 
 function LoginPage() {
   const [name, setName] = useState("");
+  const [posonal_number, setPosonalNumber] = useState(""); // Use posonal_number for login
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   useEffect(() => {
     if (session) {
+      // Redirect to different pages based on role
       if (session.user.role === "admin") {
         router.replace("/admin");
       } else {
@@ -25,30 +27,38 @@ function LoginPage() {
     }
   }, [session, router]);
 
+  useEffect(() => {
+    setIsLoading(status === "loading");
+  }, [status]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setError(""); // Clear error on new submit
     setIsLoading(true);
+
+    if (!name || !posonal_number) {
+      setError("กรุณากรอกชื่อและรหัสผ่าน");
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const res = await signIn("credentials", {
         name,
+        posonal_number, // Pass posonal_number instead of password
         redirect: false,
       });
 
-      if (res.error) {
-        setError("ไม่พบผู้ใช้");
+      if (res?.error) {
+        setError("ไม่พบผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
         setIsLoading(false);
         return;
       }
 
-      if (res.user.role === "admin") {
-        router.replace("/admin");
-      } else {
-        router.replace("/vote");
-      }
+      // The redirect will be handled by useEffect watching the session
     } catch (error) {
       console.log(error);
+      setError("เกิดข้อผิดพลาดในการเข้าสู่ระบบ");
       setIsLoading(false);
     }
   };
@@ -57,7 +67,7 @@ function LoginPage() {
     <div className="flex flex-col min-h-screen relative">
       <Navbar />
 
-      <main className="flex-grow flex items-center justify-center bg-gradient-to-br from-teal-400 via-blue-500 to-purple-600 px-4 py-8">
+      <main className="flex-grow flex items-center justify-center bg-gradient-to-br from-teal-400 via-blue-300 to-purple-400 px-4 py-8">
         <div className="absolute inset-0 bg-grid-white/30 bg-grid-8 opacity-10"></div>
 
         {/* Loading Screen */}
@@ -68,7 +78,7 @@ function LoginPage() {
         )}
 
         {/* Main Content */}
-        <div className="relative z-10 w-full max-w-md mx-auto bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-6 sm:p-8">
+        <div className="relative z-10 w-full max-w-xl mx-auto bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-6 sm:p-8">
           <h1 className="text-2xl sm:text-3xl text-black font-semibold text-center mb-4">
             เลือกตั้งนายกองค์การ
           </h1>
@@ -95,6 +105,27 @@ function LoginPage() {
               />
             </div>
             <div>
+              <label className="label flex items-center">
+                <span className="text-sm sm:text-base label-text text-black">
+                  รหัสผ่าน
+                </span>
+                <span className="text-red_1-500 text-sm ml-1">*</span>
+                <span className="text-red_1-500 text-sm ml-2">
+                  รหัสผ่านคือ เลขประจำตัวประชาชน
+                </span>
+              </label>
+              <input
+                type="password"
+                value={posonal_number} // Bind posonal_number
+                onChange={(e) => setPosonalNumber(e.target.value)} // Update posonal_number
+                className="w-full text-black bg-slate-50 input border-2 border-gray-300 
+        hover:border-teal-400 focus:border-teal-500 
+        focus:ring-2 focus:ring-teal-200 
+        transition-all duration-300 ease-in-out p-2 rounded-md"
+                placeholder="รหัสผ่าน"
+              />
+            </div>
+            <div>
               <button
                 type="submit"
                 className="w-full py-3 bg-teal-500 text-black rounded-md
@@ -108,7 +139,11 @@ function LoginPage() {
             </div>
           </form>
 
-          {error && <p className="text-red-500 text-center mt-3 text-sm sm:text-base">{error}</p>}
+          {error && (
+            <p className="text-red_1-500 text-center mt-3 text-sm sm:text-base">
+              {error}
+            </p>
+          )}
         </div>
       </main>
 

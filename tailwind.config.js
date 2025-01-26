@@ -57,6 +57,10 @@ const config: Config = {
         success: "#219653",
         danger: "#D34053",
         warning: "#FFA70B",
+        red_1: {
+          500: "#FB5454", // กำหนดเฉดสีสำหรับ red-500
+          600: "#E63946", // กำหนดเฉดสีสำหรับ red-600
+        },
       },
       fontSize: {
         "title-xxl": ["44px", "55px"],

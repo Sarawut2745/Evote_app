@@ -57,7 +57,7 @@ function LoginPage() {
     <div className="flex flex-col min-h-screen relative">
       <Navbar />
 
-      <main className="flex-grow flex items-center justify-center bg-gradient-to-br from-teal-400 via-blue-500 to-purple-600 px-4 py-8">
+      <main className="flex-grow flex items-center justify-center bg-gradient-to-br from-teal-400 via-blue-300 to-purple-400 px-4 py-8">
         <div className="absolute inset-0 bg-grid-white/30 bg-grid-8 opacity-10"></div>
 
         {/* Loading Screen */}
@@ -68,7 +68,7 @@ function LoginPage() {
         )}
 
         {/* Main Content */}
-        <div className="relative z-10 w-full max-w-md mx-auto bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-6 sm:p-8">
+        <div className="relative z-10 w-full max-w-xl mx-auto bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-6 sm:p-8">
           <h1 className="text-2xl sm:text-3xl text-black font-semibold text-center mb-4">
             เลือกตั้งนายกองค์การ
           </h1>
