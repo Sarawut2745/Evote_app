@@ -32,20 +32,20 @@ export default function ElectionPage() {
 
   // Show a loading message until the data is fetched
   if (loading) {
-    return <div className="text-center">กำลังโหลดข้อมูล...</div>;
+    return <div className="text-center text-gray-500">กำลังโหลดข้อมูล...</div>;
   }
 
   return (
     <div className="bg-gray-50 font-sans">
       {/* Header */}
-      <header className="bg-blue-600 text-white p-5">
+      <header className="bg-blue-700 text-white p-5">
         <div className="container mx-auto flex justify-between items-center">
           <div className="text-center">
             <h1 className="text-3xl font-semibold">การเลือกตั้ง 2025</h1>
             <p>โปรดเลือกผู้สมัครที่คุณเชื่อมั่น</p>
           </div>
           <Link
-            className="bg-white text-blue-600 px-4 py-2 rounded-lg font-semibold"
+            className="bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold"
             href={`/login`}
           >
             Login
@@ -56,7 +56,7 @@ export default function ElectionPage() {
       {/* Main Content */}
       <main className="py-10">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold text-center mb-6">
+          <h2 className="text-2xl font-bold text-center mb-6 text-black-500">
             เบอร์ผู้สมัครในการเลือกตั้ง
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -80,9 +80,7 @@ export default function ElectionPage() {
                   <h3 className="text-xl font-semibold text-gray-800">
                     {candidate.name + " " + candidate.lastname}
                   </h3>
-                  <p className="text-gray-600">
-                    {candidate.party_slogan}
-                  </p>
+                  <p className="text-gray-600">{candidate.party_slogan}</p>
                 </div>
               </div>
             ))}
@@ -91,7 +89,7 @@ export default function ElectionPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-blue-600 text-white py-4">
+      <footer className="bg-blue-700 text-white py-4">
         <div className="container mx-auto text-center">
           <p>&copy; 2025 การเลือกตั้งไทย - ทุกสิทธิ์สงวนไว้</p>
         </div>
