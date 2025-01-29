@@ -9,7 +9,7 @@ import { useSession } from "next-auth/react";
 
 function LoginPage() {
   const [name, setName] = useState("");
-  const [posonal_number, setPosonalNumber] = useState(""); // Use posonal_number for login
+  const [posonal_number, setPosonalNumber] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -28,8 +28,12 @@ function LoginPage() {
   }, [session, router]);
 
   useEffect(() => {
-    setIsLoading(status === "loading");
-  }, [status]);
+    if (status === "loading") {
+      setIsLoading(true);
+    } else {
+      setIsLoading(false);
+    }
+  }, [status]); // Ensure effect only runs when status changes
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -12,7 +12,8 @@ const ElectionSchema = new Schema(
         img_profile: { type: String, required: true },
         party_policies: { type: String, required: true },
         party_details: { type: String, required: true },
-        number_no: { type: Number, required: true }
+        number_no: { type: Number, required: true },
+        party_slogan: { type: String, required: true }
     },
     {
         timestamps: true

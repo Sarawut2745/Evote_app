@@ -1,3 +1,4 @@
+// /app/api/election/route.js
 import { connectMongoDB } from "../../../../lib/mongodb";
 import Post from "../../../../models/election";
 import Scores from "../../../../models/scores_el";
@@ -20,6 +21,7 @@ export async function POST(req) {
     const party_policies = formData.get("party_policies");
     const party_details = formData.get("party_details");
     const img_work = formData.get("img_work");
+    const party_slogan = formData.get("party_slogan");
 
     // Check for missing fields
     if (
@@ -33,6 +35,7 @@ export async function POST(req) {
       !class_room ||
       !party_policies ||
       !party_details ||
+      !party_slogan ||
       !img_work
     ) {
       return NextResponse.json({ 
@@ -48,7 +51,8 @@ export async function POST(req) {
           class_room: !class_room,
           party_policies: !party_policies,
           party_details: !party_details,
-          img_work: !img_work
+          img_work: !img_work,
+          party_slogan: !party_slogan
         },
         status: 400 
       });
@@ -110,6 +114,7 @@ export async function POST(req) {
       class_room,
       party_policies,
       party_details,
+      party_slogan,
       img_work: workFileWithExt,
     });
 
@@ -124,7 +129,6 @@ export async function POST(req) {
   }
 }
 
-// GET and DELETE functions remain the same as in the original code
 export async function GET() {
   await connectMongoDB();
   const posts = await Post.find({});

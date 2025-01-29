@@ -2,6 +2,7 @@
 const nextConfig = {
     images: {
         domains: ["images.remotePatterns"],
+        domains: ['via.placeholder.com'],
         
     }
 };

@@ -3,8 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from 'next/image';
-
+import Image from "next/image";
 
 function EditPostPage({ params }) {
   const { id } = params;
@@ -25,6 +24,7 @@ function EditPostPage({ params }) {
   const [newImg, setNewImg] = useState(null);
   const [newWorkImg, setNewWorkImg] = useState(null);
   const [oldImgName, setOldImgName] = useState("");
+  const [party_slogan, setParty_slogan] = useState("");
   const router = useRouter();
 
   // Fetch post data by ID
@@ -48,6 +48,7 @@ function EditPostPage({ params }) {
       setClass_room(data.post?.class_room || "");
       setGrade(data.post?.grade || "");
       setNumber(data.post?.number_no || "");
+      setParty_slogan(data.post?.party_slogan || ""); // Fix: Set party_slogan
       setParty_policies(data.post?.party_policies || "");
       setParty_details(data.post?.party_details || "");
       setPreview_work(`/assets/election/work/${data.post?.img_work}`);
@@ -91,6 +92,7 @@ function EditPostPage({ params }) {
     formData.append("class_room", class_room);
     formData.append("grade", grade);
     formData.append("number_no", number_no);
+    formData.append("party_slogan", party_slogan);
     formData.append("party_policies", party_policies);
     formData.append("party_details", party_details);
 
@@ -190,7 +192,9 @@ function EditPostPage({ params }) {
                 <option value="โรงแรม">แผนกวิชาการโรงแรม</option>
                 <option value="ท่องเที่ยว">แผนกวิชาการท่องเที่ยว</option>
                 <option value="อาหาร">แผนกวิชาอาหารและโภชนาการ</option>
-                <option value="ผ้าและสื่อสิ่งทอ">แผนกวิชาผ้าและสื่อสิ่งทอ</option>
+                <option value="ผ้าและสื่อสิ่งทอ">
+                  แผนกวิชาผ้าและสื่อสิ่งทอ
+                </option>
                 <option value="คหกรรม">แผนกวิชาคหกรรม</option>
                 <option value="ธุรกิจค้าปลีก">แผนกวิชาธุรกิจค้าปลีก</option>
               </select>
@@ -277,7 +281,12 @@ function EditPostPage({ params }) {
                     onChange={handleImgwork}
                     className="hidden"
                   />
-                  <span className="text-gray-600 truncate" style={{ maxWidth: '150px' }}>{fileName_work || "ยังไม่ได้เลือกไฟล์"}</span>
+                  <span
+                    className="text-gray-600 truncate"
+                    style={{ maxWidth: "150px" }}
+                  >
+                    {fileName_work || "ยังไม่ได้เลือกไฟล์"}
+                  </span>
                 </div>
               </div>
 
@@ -299,7 +308,12 @@ function EditPostPage({ params }) {
                     onChange={handleImgChange}
                     className="hidden"
                   />
-                  <span className="text-gray-600 truncate" style={{ maxWidth: '150px' }}>{fileName_profile || "ยังไม่ได้เลือกไฟล์"}</span>
+                  <span
+                    className="text-gray-600 truncate"
+                    style={{ maxWidth: "150px" }}
+                  >
+                    {fileName_profile || "ยังไม่ได้เลือกไฟล์"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -343,6 +357,19 @@ function EditPostPage({ params }) {
           {/* นโยบายพรรค */}
           <div>
             <label className="block text-lg font-medium text-gray-700 mb-2">
+              สโลแกนพรรค
+            </label>
+            <input
+              value={party_slogan}
+              onChange={(e) => setParty_slogan(e.target.value)} // Correctly update party_slogan value
+              rows="5"
+              className="block p-4 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="ป้อนสโลแกนพรรค"
+            />  
+          </div>
+
+          <div>
+            <label className="block text-lg font-medium text-gray-700 mb-2">
               นโยบายพรรค
             </label>
             <textarea
@@ -374,7 +401,7 @@ function EditPostPage({ params }) {
               className="bg-green-500 hover:bg-green-600 text-white border py-3 px-6 rounded text-lg"
             >
               แก้ไขผู้สมัคร
-            </button> 
+            </button>
             <Link
               href="/admin/management"
               className="bg-red hover:bg-red-600 text-white border py-3 px-6 rounded text-lg"

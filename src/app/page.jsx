@@ -1,120 +1,101 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
 
-function LoginPage() {
-  const [name, setName] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+export default function ElectionPage() {
+  const [postData, setPostData] = useState([]); // Store the posts data
+  const [loading, setLoading] = useState(true); // Track loading state
 
-  const router = useRouter();
-  const { data: session } = useSession();
-
+  // Use useEffect to fetch posts data when the component mounts
   useEffect(() => {
-    if (session) {
-      if (session.user.role === "admin") {
-        router.replace("/admin");
-      } else {
-        router.replace("/vote");
+    const getPosts = async () => {
+      try {
+        const res = await fetch("/api/election", { cache: "no-store" });
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch posts");
+        }
+
+        const data = await res.json();
+        setPostData(data.posts); // Set the posts data to state
+      } catch (error) {
+        console.error("Error loading posts:", error);
+      } finally {
+        setLoading(false); // Set loading to false once data is fetched
       }
-    }
-  }, [session, router]);
+    };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setIsLoading(true);
+    getPosts();
+  }, []); // Empty dependency array to run once when the component mounts
 
-    try {
-      const res = await signIn("credentials", {
-        name,
-        redirect: false,
-      });
-
-      if (res.error) {
-        setError("ไม่พบผู้ใช้");
-        setIsLoading(false);
-        return;
-      }
-
-      if (res.user.role === "admin") {
-        router.replace("/admin");
-      } else {
-        router.replace("/vote");
-      }
-    } catch (error) {
-      console.log(error);
-      setIsLoading(false);
-    }
-  };
+  // Show a loading message until the data is fetched
+  if (loading) {
+    return <div className="text-center">กำลังโหลดข้อมูล...</div>;
+  }
 
   return (
-    <div className="flex flex-col min-h-screen relative">
-      <Navbar />
-
-      <main className="flex-grow flex items-center justify-center bg-gradient-to-br from-teal-400 via-blue-300 to-purple-400 px-4 py-8">
-        <div className="absolute inset-0 bg-grid-white/30 bg-grid-8 opacity-10"></div>
-
-        {/* Loading Screen */}
-        {isLoading && (
-          <div className="absolute inset-0 bg-white/70 z-20 flex items-center justify-center">
-            <div className="loader border-t-4 border-teal-500 rounded-full w-12 h-12 animate-spin"></div>
+    <div className="bg-gray-50 font-sans">
+      {/* Header */}
+      <header className="bg-blue-600 text-white p-5">
+        <div className="container mx-auto flex justify-between items-center">
+          <div className="text-center">
+            <h1 className="text-3xl font-semibold">การเลือกตั้ง 2025</h1>
+            <p>โปรดเลือกผู้สมัครที่คุณเชื่อมั่น</p>
           </div>
-        )}
+          <Link
+            className="bg-white text-blue-600 px-4 py-2 rounded-lg font-semibold"
+            href={`/login`}
+          >
+            Login
+          </Link>
+        </div>
+      </header>
 
-        {/* Main Content */}
-        <div className="relative z-10 w-full max-w-xl mx-auto bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-6 sm:p-8">
-          <h1 className="text-2xl sm:text-3xl text-black font-semibold text-center mb-4">
-            เลือกตั้งนายกองค์การ
-          </h1>
-          <h1 className="text-2xl sm:text-3xl text-black font-semibold text-center mb-6">
-            นักวิชาชีพในอนาคตแห่งประเทศไทย
-          </h1>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="label">
-                <span className="text-sm sm:text-base label-text text-black">
-                  เลขประจำตัวนักเรียนนักศึกษา
-                </span>
-              </label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full text-black bg-slate-50 input border-2 border-gray-300 
-                    hover:border-teal-400 focus:border-teal-500 
-                    focus:ring-2 focus:ring-teal-200 
-                    transition-all duration-300 ease-in-out p-2 rounded-md"
-                placeholder="เลขประจำตัวนักเรียนนักศึกษา"
-              />
-            </div>
-            <div>
-              <button
-                type="submit"
-                className="w-full py-3 bg-teal-500 text-black rounded-md
-                  hover:bg-teal-600 hover:text-white 
-                  focus:outline-none focus:ring-2 focus:ring-teal-400
-                  transition-all duration-300 ease-in-out
-                  flex items-center justify-center gap-2"
+      {/* Main Content */}
+      <main className="py-10">
+        <div className="container mx-auto px-4">
+          <h2 className="text-2xl font-bold text-center mb-6">
+            เบอร์ผู้สมัครในการเลือกตั้ง
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Mapping through posts data */}
+            {postData.map((candidate) => (
+              <div
+                key={candidate.id}
+                className="bg-white shadow-lg rounded-lg overflow-hidden flex flex-col"
               >
-                เข้าสู่ระบบ
-              </button>
-            </div>
-          </form>
-
-          {error && <p className="text-red-500 text-center mt-3 text-sm sm:text-base">{error}</p>}
+                {/* Image with fixed height */}
+                <div className="relative h-64">
+                  <Image
+                    src={`/assets/election/profile/${candidate.img_profile}`}
+                    alt={candidate.name}
+                    layout="fill"
+                    objectFit="cover"
+                    className="w-full h-full"
+                  />
+                </div>
+                <div className="p-6 flex-grow">
+                  <h3 className="text-xl font-semibold text-gray-800">
+                    {candidate.name + " " + candidate.lastname}
+                  </h3>
+                  <p className="text-gray-600">
+                    {candidate.party_slogan}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </main>
 
-      <Footer />
+      {/* Footer */}
+      <footer className="bg-blue-600 text-white py-4">
+        <div className="container mx-auto text-center">
+          <p>&copy; 2025 การเลือกตั้งไทย - ทุกสิทธิ์สงวนไว้</p>
+        </div>
+      </footer>
     </div>
   );
 }
-
-export default LoginPage;

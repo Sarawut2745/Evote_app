@@ -17,6 +17,7 @@ function CreatePostPage() {
   const [number_no, setNumber] = useState("");
   const [party_policies, setParty_policies] = useState("");
   const [party_details, setParty_details] = useState("");
+  const [party_slogan, setParty_slogan] = useState("");
 
   const [preview_work, setPreview_work] = useState(null);
   const [preview_profile, setPreview_profile] = useState(null);
@@ -71,19 +72,8 @@ function CreatePostPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ตรวจสอบว่าฟิลด์สำคัญทั้งหมดถูกกรอกครบ
-    if (
-      !name ||
-      !lastname ||
-      !img_profile ||
-      !number_no ||
-      !department ||
-      !class_room ||
-      !party_policies ||
-      !party_details ||
-      !img_work
-    ) {
-      alert("Please complete all inputs.");
+    if (!name || !lastname || !personal_ip || !grade || !number_no || !department || !class_room || !party_policies || !party_details || !party_slogan || !img_profile || !img_work) {
+      alert("กรุณากรอกข้อมูลให้ครบถ้วน");
       return;
     }
 
@@ -92,12 +82,13 @@ function CreatePostPage() {
     formData.append("lastname", lastname);
     formData.append("personal_ip", personal_ip);
     formData.append("grade", grade);
-    formData.append("img_profile", img_profile);
     formData.append("number_no", number_no);
     formData.append("department", department);
     formData.append("class_room", class_room);
     formData.append("party_policies", party_policies);
     formData.append("party_details", party_details);
+    formData.append("party_slogan", party_slogan);
+    formData.append("img_profile", img_profile);
     formData.append("img_work", img_work);
 
     try {
@@ -358,6 +349,19 @@ function CreatePostPage() {
           {/* นโยบายพรรค */}
           <div>
             <label className="block text-lg font-medium text-gray-700 mb-2">
+              สโลแกนพรรค
+            </label>
+            <input
+              value={party_slogan}
+              onChange={(e) => setParty_slogan(e.target.value)}
+              rows="5"
+              className="block p-4 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="ป้อนสโลแกนพรรค"
+            />
+          </div>
+
+          <div>
+            <label className="block text-lg font-medium text-gray-700 mb-2">
               นโยบายพรรค
             </label>
             <textarea
@@ -382,6 +386,7 @@ function CreatePostPage() {
               placeholder="ป้อนข้อมูลพรรค"
             />
           </div>
+
           {/* ปุ่มส่งข้อมูล */}
           <div className="flex justify-between">
             <button

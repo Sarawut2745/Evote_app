@@ -3,10 +3,23 @@ import Link from "next/link";
 import Image from "next/image";
 import ClickOutside from "../../components/ClickOutside";
 import { signOut, useSession } from "next-auth/react";
-
+import { useRouter } from "next/navigation"; // Import useRouter
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  // Access session data
+  const { data: session } = useSession();
+
+  // Check if session data is available
+  const userName = session?.user?.name || "ผู้ดูแลระบบ"; // Default value if not available
+  const userImage = session?.user?.image || "/images/user/user-01.png"; // Default image if not available
+
+  // Handle Logout
+  const handleLogout = async () => {
+    // Use signOut with redirect set to true to avoid manual routing
+    await signOut({ redirect: true, callbackUrl: "/" });
+  };
 
   return (
     <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
@@ -58,10 +71,10 @@ const DropdownUser = () => {
         <div
           className={`absolute right-0 mt-4 flex w-62.5 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark`}
         >
-          <button className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base" onClick={async () => {
-            await signOut({ redirect: false });
-
-          }}>
+          <button
+            className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+            onClick={handleLogout} // Use handleLogout here
+          >
             <svg
               className="fill-current"
               width="22"
