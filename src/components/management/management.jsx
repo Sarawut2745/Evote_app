@@ -107,7 +107,9 @@ export default function Management() {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="mb-6">
-        <h3 className="text-2xl font-semibold text-gray-800">จัดการข้อมูลผู้สมัคร</h3>
+        <h3 className="text-2xl font-semibold text-gray-800">
+          จัดการข้อมูลผู้สมัคร
+        </h3>
       </div>
 
       <div className="mb-6 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 md:space-x-4">
@@ -152,15 +154,21 @@ export default function Management() {
                 <th className="text-center text-gray-600 py-2 px-4">รูปภาพ</th>
                 <th className="text-left text-gray-600 py-2 px-4">ชื่อ</th>
                 <th className="text-left text-gray-600 py-2 px-4">นามกุล</th>
-                <th className="text-left text-gray-600 py-2 px-4">เบอร์หมายเลข</th>
-                <th className="text-center text-gray-600 py-2 px-4">การจัดการ</th>
+                <th className="text-left text-gray-600 py-2 px-4">
+                  เบอร์หมายเลข
+                </th>
+                <th className="text-center text-gray-600 py-2 px-4">
+                  การจัดการ
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {postData.length > 0 ? (
                 postData.map((post, index) => (
                   <tr key={post._id}>
-                    <td className="text-gray-700 text-center py-2 px-4">{index + 1}</td>
+                    <td className="text-gray-700 text-center py-2 px-4">
+                      {index + 1}
+                    </td>
                     <td className="text-center py-2 px-4">
                       <Image
                         src={`/assets/election/profile/${post.img_profile}`}
@@ -172,20 +180,22 @@ export default function Management() {
                     </td>
                     <td className="text-gray-700 py-2 px-4">{post.name}</td>
                     <td className="text-gray-700 py-2 px-4">{post.lastname}</td>
-                    <td className="text-gray-700 py-2 px-4">{post.number_no}</td>
+                    <td className="text-gray-700 py-2 px-4">
+                      {post.number_no}
+                    </td>
                     <td className="py-2 px-4">
                       <div className="flex justify-center space-x-4">
                         <Link
-                          className="btn bg-amber-400 hover:bg-amber-500 text-white py-1 px-3 rounded-lg shadow-sm transition border-base-content duration-150 ease-in-out"
+                          className="btn bg-amber-400 hover:bg-amber-500 text-white py-2 px-5 rounded-lg shadow-sm transition border-base-content duration-150 ease-in-out text-lg"
                           href={`/admin/management/edit/${post._id}`}
                         >
-                          <FontAwesomeIcon icon={faEdit} />
+                          <FontAwesomeIcon icon={faEdit} className="text-xl" />{" "}
                         </Link>
                         <button
                           onClick={() => openModal(post._id)}
-                          className="btn bg-red hover:bg-red text-white py-1 px-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
+                          className="btn bg-red_1-500 hover:bg-red_1-600 text-white py-2 px-5 rounded-lg shadow-sm transition duration-150 ease-in-out text-lg"
                         >
-                          <FontAwesomeIcon icon={faTrash} />
+                          <FontAwesomeIcon icon={faTrash} className="text-xl" />{" "}
                         </button>
                       </div>
                     </td>
@@ -206,18 +216,24 @@ export default function Management() {
       {modalOpen && (
         <div
           className={`fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50 
-            transition-opacity duration-300 ease-in-out ${isClosing ? "opacity-0" : "opacity-100"}`}
+            transition-opacity duration-300 ease-in-out ${
+              isClosing ? "opacity-0" : "opacity-100"
+            }`}
           onClick={closeModal}
         >
           <div
             className={`bg-white p-8 rounded-lg shadow-lg max-w-lg w-full transform transition-transform duration-300 
-              ease-in-out ${isClosing ? "scale-95 opacity-0" : "scale-100 opacity-100"}`}
+              ease-in-out ${
+                isClosing ? "scale-95 opacity-0" : "scale-100 opacity-100"
+              }`}
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-xl font-bold mb-4">ยืนยันการลบ</h2>
-            <p className="mb-4 text-lg">คุณแน่ใจหรือไม่ว่าต้องการลบผู้สมัครนี้?</p>
+            <p className="mb-4 text-lg">
+              คุณแน่ใจหรือไม่ว่าต้องการลบผู้สมัครนี้?
+            </p>
             <div className="flex justify-end">
-            <button
+              <button
                 onClick={closeModal}
                 className="btn bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg mr-2"
               >
