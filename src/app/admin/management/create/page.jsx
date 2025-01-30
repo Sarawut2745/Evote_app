@@ -259,6 +259,9 @@ function CreatePostPage() {
               <div>
                 <label className="block text-lg font-medium text-gray-700 mb-2">
                   รูปผลงานผู้สมัคร
+                  <span className="text-red_1-500 text-sm ml-2">
+                  *รูปขนาดไม่เกิน 320x200px
+                </span>
                 </label>
                 <div className="flex items-center space-x-4">
                   <label
@@ -286,6 +289,9 @@ function CreatePostPage() {
               <div>
                 <label className="block text-lg font-medium text-gray-700 mb-2">
                   รูปผู้สมัคร
+                  <span className="text-red_1-500 text-sm ml-2">
+                  *รูปขนาดไม่เกิน 200x200px
+                </span>
                 </label>
                 <div className="flex items-center space-x-4">
                   <label
