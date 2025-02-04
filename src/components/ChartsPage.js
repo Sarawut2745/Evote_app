@@ -9,16 +9,25 @@ const ChartsPage = () => {
   const [numberNoCounts, setNumberNoCounts] = useState([]);
   const [totalDocumentCount, setTotalDocumentCount] = useState(0);
 
-  useEffect(() => {
-    const fetchCounts = async () => {
-      const response = await fetch('/api/scores');
-      const data = await response.json();
-      setUserTypeCounts(data.userTypeCounts);
-      setNumberNoCounts(data.numberNoCounts);
-      setTotalDocumentCount(data.totalDocumentCount);
-    };
+  const fetchCounts = async () => {
+    const response = await fetch('/api/scores');
+    const data = await response.json();
+    setUserTypeCounts(data.userTypeCounts);
+    setNumberNoCounts(data.numberNoCounts);
+    setTotalDocumentCount(data.totalDocumentCount);
+  };
 
+  useEffect(() => {
+    // ดึงข้อมูลครั้งแรก
     fetchCounts();
+
+    // ตั้งเวลาให้ดึงข้อมูลใหม่ทุกๆ 1 นาที
+    const intervalId = setInterval(() => {
+      fetchCounts();
+    }, 60000); // 60,000 มิลลิวินาที = 1 นาที
+
+    // ล้างเวลาเมื่อ component ถูกทำลาย
+    return () => clearInterval(intervalId);
   }, []);
 
   const userTypeMapping = {
@@ -31,7 +40,6 @@ const ChartsPage = () => {
 
   const userTypeLabels = userTypeCounts.map(item => userTypeMapping[item.user_type] || item.user_type);
   const userTypeValues = userTypeCounts.map(item => item.count);
-
 
   const numberNoLabels = numberNoCounts.map(item => item.number_no);
   const numberNoValues = numberNoCounts.map(item => item.count);
@@ -61,12 +69,12 @@ const ChartsPage = () => {
     ],
   };
 
-  // Bar chart data for number_no
+  // ข้อมูลสำหรับกราฟแท่ง
   const barData = {
     labels: numberNoLabels,
     datasets: [
       {
-        label: 'จำนวนคำแนน',
+        label: 'จำนวนคะแนน',
         data: numberNoValues,
         backgroundColor: 'rgba(75, 192, 192, 0.2)',
         borderColor: 'rgba(75, 192, 192, 1)',
@@ -87,9 +95,9 @@ const ChartsPage = () => {
           </div>
         </div>
 
-        {/* Charts Section */}
+        {/* ส่วนของกราฟ */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Pie Chart for User Types */}
+          {/* กราฟวงกลมแสดงประเภทผู้ใช้ */}
           <div className="bg-white shadow-md rounded-lg p-6">
             <h2 className="text-xl font-semibold text-gray-800 text-center mb-4">ห้องเรียนที่มาใช้สิทธิ</h2>
             <div className="h-96">
@@ -97,7 +105,7 @@ const ChartsPage = () => {
             </div>
           </div>
 
-          {/* Bar Chart for Number No */}
+          {/* กราฟแท่งแสดงคะแนนของผู้สมัคร */}
           <div className="bg-white shadow-md rounded-lg p-6">
             <h2 className="text-xl font-semibold text-gray-800 text-center mb-4">คะแนน ผู้สมัคร</h2>
             <div className="h-96">
