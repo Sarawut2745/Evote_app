@@ -30,7 +30,7 @@ function DeleteBtn({ id }) {
     <>
       <button
         onClick={() => setIsModalOpen(true)}
-        className="btn bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg shadow-md transition-transform duration-300 ease-in-out transform active:scale-95"
+        className="btn bg-red_1-500 hover:bg-red_1-600 text-white py-2 px-4 rounded-lg shadow-md transition-transform duration-300 ease-in-out transform active:scale-95"
       >
         <FontAwesomeIcon icon={faTrash} className="text-white" />
       </button>
@@ -62,7 +62,7 @@ function DeleteBtn({ id }) {
                   handleDelete();
                   closeModal();
                 }}
-                className="bg-red-500 text-white py-2 px-4 rounded transition-colors duration-200 ease-in-out hover:bg-red-600"
+                className="bg-red_1-500 text-white py-2 px-4 rounded transition-colors duration-200 ease-in-out hover:bg-red_1-600"
               >
                 ยืนยัน
               </button>

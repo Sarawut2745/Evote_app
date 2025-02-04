@@ -190,9 +190,9 @@ const UserImport = () => {
           )}
 
           {errors.length > 0 && (
-            <div className="mb-6 p-4 bg-red-50 rounded-lg">
+            <div className="mb-6 p-4 bg-red_1-50 rounded-lg">
               <h4 className="text-red-700 font-semibold mb-2">พบข้อผิดพลาด:</h4>
-              <ul className="list-disc list-inside text-red-600">
+              <ul className="list-disc list-inside text-red_1-600">
                 {errors.map((error, index) => (
                   <li key={index}>{error}</li>
                 ))}

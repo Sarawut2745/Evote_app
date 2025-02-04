@@ -1,29 +1,29 @@
-// /app/api/election/route.js
-import { connectMongoDB } from "../../../../lib/mongodb";
-import Post from "../../../../models/election";
-import Scores from "../../../../models/scores_el";
-import { NextResponse } from "next/server";
-import path from "path";
-import { writeFile } from "fs/promises";
-import { unlink } from "fs/promises";
+import { connectMongoDB } from "../../../../lib/mongodb"; // นำเข้าฟังก์ชันเชื่อมต่อ MongoDB
+import Post from "../../../../models/election"; // นำเข้าโมเดลการเลือกตั้ง
+import Scores from "../../../../models/scores_el"; // นำเข้าโมเดลคะแนน
+import { NextResponse } from "next/server"; // นำเข้า NextResponse สำหรับการส่งคำตอบ
+import path from "path"; // นำเข้า path เพื่อจัดการกับเส้นทางไฟล์
+import { writeFile } from "fs/promises"; // นำเข้าฟังก์ชันเขียนไฟล์
+import { unlink } from "fs/promises"; // นำเข้าฟังก์ชันลบไฟล์
 
+// ฟังก์ชัน POST สำหรับการอัปโหลดข้อมูลการเลือกตั้ง
 export async function POST(req) {
   try {
-    const formData = await req.formData();
-    const name = formData.get("name");
-    const lastname = formData.get("lastname");
-    const personal_ip = formData.get("personal_ip");
-    const img_profile = formData.get("img_profile");
-    const grade = formData.get("grade");
-    const number_no = formData.get("number_no");
-    const department = formData.get("department");
-    const class_room = formData.get("class_room");
-    const party_policies = formData.get("party_policies");
-    const party_details = formData.get("party_details");
-    const img_work = formData.get("img_work");
-    const party_slogan = formData.get("party_slogan");
+    const formData = await req.formData(); // รับข้อมูลจากฟอร์ม
+    const name = formData.get("name"); // ชื่อ
+    const lastname = formData.get("lastname"); // นามสกุล
+    const personal_ip = formData.get("personal_ip"); // หมายเลขบัตรประชาชน
+    const img_profile = formData.get("img_profile"); // รูปโปรไฟล์
+    const grade = formData.get("grade"); // ชั้นปี
+    const number_no = formData.get("number_no"); // หมายเลขผู้สมัคร
+    const department = formData.get("department"); // สาขา
+    const class_room = formData.get("class_room"); // ห้องเรียน
+    const party_policies = formData.get("party_policies"); // นโยบายพรรค
+    const party_details = formData.get("party_details"); // รายละเอียดพรรค
+    const img_work = formData.get("img_work"); // รูปผลงาน
+    const party_slogan = formData.get("party_slogan"); // สโลแกนพรรค
 
-    // Check for missing fields
+    // ตรวจสอบข้อมูลที่หายไป
     if (
       !name ||
       !lastname ||
@@ -39,7 +39,7 @@ export async function POST(req) {
       !img_work
     ) {
       return NextResponse.json({ 
-        message: "Missing fields", 
+        message: "ข้อมูลบางส่วนหายไป", 
         missingFields: {
           name: !name,
           lastname: !lastname,
@@ -58,35 +58,36 @@ export async function POST(req) {
       });
     }
 
-    // Convert numeric fields to numbers
+    // แปลงฟิลด์ที่เป็นตัวเลขเป็นตัวเลขจริง
     const personal_ipNumber = Number(personal_ip);
     const gradeNumber = Number(grade);
     const number_noNumber = Number(number_no);
 
+    // ตรวจสอบว่าฟิลด์ตัวเลขถูกต้อง
     if (isNaN(personal_ipNumber) || isNaN(gradeNumber) || isNaN(number_noNumber)) {
-      return NextResponse.json({ message: "Invalid number format", status: 400 });
+      return NextResponse.json({ message: "รูปแบบตัวเลขไม่ถูกต้อง", status: 400 });
     }
 
-    // Connect to MongoDB
+    // เชื่อมต่อกับ MongoDB
     await connectMongoDB();
 
-    // Generate unique filenames using timestamp
+    // สร้างชื่อไฟล์ที่ไม่ซ้ำกันโดยใช้ timestamp
     const profileFilename = `P${(Date.now()).toString().padStart(11, "0")}`;
     const workFilename = `W${(Date.now()).toString().padStart(11, "0")}`;
 
-    // Get file extensions
+    // รับส่วนขยายของไฟล์
     const profileExt = path.extname(img_profile.name).toLowerCase();
     const workExt = path.extname(img_work.name).toLowerCase();
 
-    // Create full filenames with extensions
+    // สร้างชื่อไฟล์เต็มพร้อมส่วนขยาย
     const profileFileWithExt = profileFilename + profileExt;
     const workFileWithExt = workFilename + workExt;
 
-    // Convert image buffers
+    // แปลงไฟล์เป็น buffer
     const profileBuffer = Buffer.from(await img_profile.arrayBuffer());
     const workBuffer = Buffer.from(await img_work.arrayBuffer());
 
-    // Save profile image
+    // บันทึกรูปโปรไฟล์
     await writeFile(
       path.join(
         process.cwd(),
@@ -96,16 +97,16 @@ export async function POST(req) {
       profileBuffer
     );
 
-    // Save work image
+    // บันทึกรูปผลงาน
     await writeFile(
       path.join(process.cwd(), "public/assets/election/work", workFileWithExt),
       workBuffer
     );
 
-    // Create database entry
+    // สร้างข้อมูลในฐานข้อมูล
     const savedPost = await Post.create({
       name,
-      lastname, // Explicitly include lastname
+      lastname, // รวมถึงนามสกุลด้วย
       personal_ip: personal_ipNumber,
       img_profile: profileFileWithExt,
       grade: gradeNumber,
@@ -118,84 +119,79 @@ export async function POST(req) {
       img_work: workFileWithExt,
     });
 
-    return NextResponse.json({ message: "Success", status: 201 });
+    return NextResponse.json({ message: "สำเร็จ", status: 201 });
   } catch (error) {
-    console.error("Error occurred:", error);
     return NextResponse.json({ 
-      message: "Failed", 
+      message: "ไม่สำเร็จ", 
       error: error.message, 
       status: 500 
     });
   }
 }
 
+// ฟังก์ชัน GET สำหรับดึงข้อมูลโพสต์ทั้งหมด
 export async function GET() {
-  await connectMongoDB();
-  const posts = await Post.find({});
+  await connectMongoDB(); // เชื่อมต่อกับ MongoDB
+  const posts = await Post.find({}); // ค้นหาข้อมูลโพสต์ทั้งหมด
   return NextResponse.json({ posts });
 }
 
+// ฟังก์ชัน DELETE สำหรับลบโพสต์และข้อมูลที่เกี่ยวข้อง
 export async function DELETE(req) {
   try {
-    const id = req.nextUrl.searchParams.get("id");
+    const id = req.nextUrl.searchParams.get("id"); // รับ ID จาก query string
     if (!id) {
-      return NextResponse.json({ message: "ID not provided" }, { status: 400 });
+      return NextResponse.json({ message: "ไม่พบ ID" }, { status: 400 });
     }
 
-    await connectMongoDB();
+    await connectMongoDB(); // เชื่อมต่อกับ MongoDB
 
-    // Find the post by ID
+    // ค้นหาข้อมูลโพสต์ตาม ID
     const post = await Post.findById(id);
 
     if (!post) {
-      return NextResponse.json({ message: "Post not found" }, { status: 404 });
+      return NextResponse.json({ message: "ไม่พบโพสต์" }, { status: 404 });
     }
 
-    // Delete the post from the database
+    // ลบโพสต์จากฐานข้อมูล
     await Post.findByIdAndDelete(id);
 
-    // Delete related scores
+    // ลบคะแนนที่เกี่ยวข้อง
     await Scores.deleteMany({ number_no: post.number_no });
 
-    // Delete profile image
+    // ลบไฟล์รูปโปรไฟล์
     const imgProfilePath = path.join(
       process.cwd(),
       "public/assets/election/profile",
       post.img_profile
     );
 
-    // Delete work image
+    // ลบไฟล์รูปผลงาน
     const imgWorkPath = path.join(
       process.cwd(),
       "public/assets/election/work",
       post.img_work
     );
 
-    // Try to delete profile image file
+    // พยายามลบไฟล์รูปโปรไฟล์
     try {
       await unlink(imgProfilePath);
-      console.log(`Profile image file ${imgProfilePath} deleted successfully`);
     } catch (fileError) {
-      console.error(
-        `Failed to delete profile image: ${imgProfilePath}`,
-        fileError
-      );
+      // หากลบไฟล์ไม่สำเร็จ
     }
 
-    // Try to delete work image file
+    // พยายามลบไฟล์รูปผลงาน
     try {
       await unlink(imgWorkPath);
-      console.log(`Work image file ${imgWorkPath} deleted successfully`);
     } catch (fileError) {
-      console.error(`Failed to delete work image: ${imgWorkPath}`, fileError);
+      // หากลบไฟล์ไม่สำเร็จ
     }
 
     return NextResponse.json(
-      { message: "Post, related scores, and files deleted" },
+      { message: "โพสต์, คะแนนที่เกี่ยวข้อง และไฟล์ถูกลบแล้ว" },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error occurred:", error);
-    return NextResponse.json({ message: "Failed", status: 500 });
+    return NextResponse.json({ message: "ไม่สำเร็จ", status: 500 });
   }
 }

@@ -4,19 +4,28 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 function UserManage() {
+  // กำหนดสถานะสำหรับการจัดเรียงข้อมูล
   const [sortOrder, setSortOrder] = useState({
     name: "asc",
     user_type: "asc",
   });
 
+  // กำหนดสถานะสำหรับข้อมูลผู้ใช้
   const [data, setData] = useState([]);
+  // กำหนดสถานะสำหรับการโหลดข้อมูล
   const [loading, setLoading] = useState(true);
+  // กำหนดสถานะสำหรับข้อผิดพลาด
   const [error, setError] = useState(null);
+  // กำหนดสถานะสำหรับข้อมูลที่กรองแล้ว
   const [filteredData, setFilteredData] = useState([]);
+  // กำหนดสถานะสำหรับคำค้นหา
   const [searchQuery, setSearchQuery] = useState("");
+  // กำหนดสถานะสำหรับการเปิด/ปิดโมดัล
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // กำหนดสถานะสำหรับผู้ใช้ที่เลือก
   const [selectedUser, setSelectedUser] = useState(null);
 
+  // ดึงข้อมูลผู้ใช้จาก API
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -37,6 +46,7 @@ function UserManage() {
     fetchData();
   }, []);
 
+  // ฟิลเตอร์ข้อมูลผู้ใช้ตามคำค้นหาที่ป้อน
   useEffect(() => {
     if (searchQuery) {
       setFilteredData(
@@ -49,16 +59,19 @@ function UserManage() {
     }
   }, [searchQuery, data]);
 
+  // ฟังก์ชันสำหรับเปิดโมดัล
   const openModal = (user) => {
     setSelectedUser(user);
     setIsModalOpen(true);
   };
 
+  // ฟังก์ชันสำหรับปิดโมดัล
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedUser(null);
   };
 
+  // ฟังก์ชันสำหรับลบผู้ใช้
   const handleDeleteUser = async () => {
     if (!selectedUser) return;
 
@@ -81,6 +94,7 @@ function UserManage() {
     }
   };
 
+  // ฟังก์ชันสำหรับการจัดเรียงข้อมูลตามชื่อและประเภทผู้ใช้
   const handleSort = (column) => {
     const newSortOrder = sortOrder[column] === "asc" ? "desc" : "asc";
     setSortOrder((prev) => ({ ...prev, [column]: newSortOrder }));
@@ -101,12 +115,15 @@ function UserManage() {
     setFilteredData(sortedData);
   };
 
+  // ฟังก์ชันสำหรับรีเซ็ตคำค้นหา
   const handleReset = () => {
     setSearchQuery("");
     setFilteredData(data);
   };
 
+  // แสดงข้อความขณะโหลดข้อมูล
   if (loading) return <div>Loading...</div>;
+  // แสดงข้อความหากมีข้อผิดพลาด
   if (error) return <div>Error: {error}</div>;
 
   return (
@@ -117,6 +134,7 @@ function UserManage() {
         </h3>
       </div>
 
+      {/* ช่องค้นหาข้อมูล */}
       <div className="mb-6 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 md:space-x-4">
         <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 max-w-lg bg-white border border-gray-300 rounded-lg shadow-md p-4 w-full md:w-auto">
           <input
@@ -127,6 +145,7 @@ function UserManage() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           <div className="flex space-x-4 md:space-x-2 px-2 mt-4 md:mt-0">
+            {/* ปุ่มรีเซ็ตการค้นหา */}
             <button
               type="button"
               onClick={handleReset}
@@ -137,6 +156,7 @@ function UserManage() {
           </div>
         </div>
 
+        {/* ลิงก์ไปยังหน้าสำหรับเพิ่มผู้สมัครและนำเข้า Excel */}
         <div className="flex space-x-4">
           <Link
             className="btn bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg shadow-sm transition duration-150 ease-in-out"
@@ -155,11 +175,12 @@ function UserManage() {
         </div>
       </div>
 
-      {/* Table Section */}
+      {/* ตารางแสดงข้อมูลผู้สมัคร */}
       <div className="overflow-x-auto bg-white border border-gray-300 rounded-lg shadow-md w-full">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-100">
             <tr>
+              {/* การจัดเรียงตามชื่อ */}
               <th
                 className="text-left text-gray-600 py-3 px-6 cursor-pointer"
                 onClick={() => handleSort("name")}
@@ -169,6 +190,7 @@ function UserManage() {
               <th className="text-left text-gray-600 py-3 px-6">
                 เลขบัตรประชาชน
               </th>
+              {/* การจัดเรียงตามประเภทผู้ใช้ */}
               <th
                 className="text-left text-gray-600 py-3 px-6 cursor-pointer"
                 onClick={() => handleSort("user_type")}
@@ -190,12 +212,14 @@ function UserManage() {
                   <td className="text-gray-700 py-3 px-6">{row.user_type}</td>
                   <td className="py-3 px-6">
                     <div className="flex justify-center gap-2">
+                      {/* ลิงก์ไปยังหน้าสำหรับแก้ไขข้อมูลผู้สมัคร */}
                       <Link
                         className="bg-amber-400 hover:bg-amber-500 text-white py-2 px-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
                         href={`/admin/user_manage/edit/${row._id}`}
                       >
                         <FontAwesomeIcon icon={faEdit} />
                       </Link>
+                      {/* ปุ่มลบผู้สมัคร */}
                       <button
                         className="bg-red_1-500 hover:bg-red_1-600 text-white py-2 px-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
                         onClick={() => openModal(row)}
@@ -217,7 +241,7 @@ function UserManage() {
         </table>
       </div>
 
-      {/* Modal Confirm Delete */}
+      {/* โมดัลยืนยันการลบผู้สมัคร */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-lg p-6 shadow-xl w-96">
@@ -226,12 +250,14 @@ function UserManage() {
               คุณแน่ใจหรือไม่ว่าต้องการลบ <strong>{selectedUser?.name}</strong>
             </p>
             <div className="mt-4 flex justify-end space-x-3">
+              {/* ปุ่มยกเลิก */}
               <button
                 className="bg-green-400 hover:bg-green-500 text-white py-2 px-4 rounded-lg transition"
                 onClick={closeModal}
               >
                 ยกเลิก
               </button>
+              {/* ปุ่มลบข้อมูล */}
               <button
                 className="bg-red_1-500 hover:bg-red_1-600 text-white py-2 px-4 rounded-lg transition"
                 onClick={handleDeleteUser}

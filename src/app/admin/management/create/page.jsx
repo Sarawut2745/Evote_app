@@ -6,77 +6,91 @@ import { useRouter } from "next/navigation";
 import NextImage from "next/image";
 
 function CreatePostPage() {
-  const [name, setName] = useState("");
-  const [lastname, setLastName] = useState("");
-  const [personal_ip, setPersonal_ip] = useState("");
-  const [department, setDepartment] = useState("");
-  const [class_room, setClass_room] = useState("");
-  const [grade, setGrade] = useState("");
-  const [img_work, setImg_work] = useState("");
-  const [img_profile, setImg_profile] = useState(null);
-  const [number_no, setNumber] = useState("");
-  const [party_policies, setParty_policies] = useState("");
-  const [party_details, setParty_details] = useState("");
-  const [party_slogan, setParty_slogan] = useState("");
+  // กำหนด state สำหรับข้อมูลที่กรอกในฟอร์ม
+  const [name, setName] = useState(""); // ชื่อ
+  const [lastname, setLastName] = useState(""); // นามสกุล
+  const [personal_ip, setPersonal_ip] = useState(""); // หมายเลขบัตรประชาชน
+  const [department, setDepartment] = useState(""); // คณะ
+  const [class_room, setClass_room] = useState(""); // ห้องเรียน
+  const [grade, setGrade] = useState(""); // ชั้นปี
+  const [img_work, setImg_work] = useState(""); // รูปภาพผลงาน
+  const [img_profile, setImg_profile] = useState(null); // รูปภาพโปรไฟล์
+  const [number_no, setNumber] = useState(""); // หมายเลข
+  const [party_policies, setParty_policies] = useState(""); // นโยบายพรรค
+  const [party_details, setParty_details] = useState(""); // รายละเอียดพรรค
+  const [party_slogan, setParty_slogan] = useState(""); // สโลแกนพรรค
 
-  const [preview_work, setPreview_work] = useState(null);
-  const [preview_profile, setPreview_profile] = useState(null);
+  const [preview_work, setPreview_work] = useState(null); // การแสดงตัวอย่างรูปผลงาน
+  const [preview_profile, setPreview_profile] = useState(null); // การแสดงตัวอย่างรูปโปรไฟล์
 
-  const [fileName_profile, setFileName_profile] = useState("โปรดเลือกรูป");
-  const [fileName_work, setFileName_work] = useState("โปรดเลือกรูป");
+  const [fileName_profile, setFileName_profile] = useState("โปรดเลือกรูป"); // ชื่อไฟล์รูปโปรไฟล์
+  const [fileName_work, setFileName_work] = useState("โปรดเลือกรูป"); // ชื่อไฟล์รูปผลงาน
 
-  const router = useRouter();
+  const router = useRouter(); // ใช้ router สำหรับเปลี่ยนหน้า
 
+  // ฟังก์ชันสำหรับจัดการการเปลี่ยนแปลงรูปโปรไฟล์
   const handleImgChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files[0]; // รับไฟล์รูปที่ผู้ใช้เลือก
     if (file) {
-      // ตรวจสอบขนาดไฟล์ภาพ
+      // สร้าง Object ของรูปภาพเพื่อตรวจสอบขนาด
       const img = new Image();
       img.onload = () => {
+        // ตรวจสอบขนาดรูปภาพ
         if (img.width <= 200 && img.height <= 200) {
+          // ถ้าขนาดถูกต้อง ตั้งค่า state สำหรับรูปโปรไฟล์
           setImg_profile(file);
-          setPreview_profile(URL.createObjectURL(file));
-          setFileName_profile(file.name);
+          setPreview_profile(URL.createObjectURL(file)); // แสดงตัวอย่างรูปโปรไฟล์
+          setFileName_profile(file.name); // แสดงชื่อไฟล์
         } else {
+          // ถ้าขนาดเกินเกณฑ์ที่กำหนด
           alert("ขนาดรูปภาพต้องไม่เกิน 200x200 พิกเซล");
         }
       };
-      img.src = URL.createObjectURL(file);
+      img.src = URL.createObjectURL(file); // โหลดรูปเพื่อคำนวณขนาด
     } else {
+      // ถ้าไม่มีการเลือกไฟล์รูปใหม่ ให้รีเซ็ตตัวอย่างรูปและชื่อไฟล์
       setPreview_profile(null);
       setFileName_profile("โปรดเลือกรูป");
     }
   };
 
+  // ฟังก์ชันสำหรับจัดการการเปลี่ยนแปลงรูปผลงาน
   const handleImgwork = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files[0]; // รับไฟล์รูปที่ผู้ใช้เลือก
     if (file) {
-      // ตรวจสอบขนาดไฟล์ภาพ
+      // สร้าง Object ของรูปภาพเพื่อตรวจสอบขนาด
       const img = new Image();
       img.onload = () => {
+        // ตรวจสอบขนาดรูปภาพ
         if (img.width <= 320 && img.height <= 200) {
+          // ถ้าขนาดถูกต้อง ตั้งค่า state สำหรับรูปผลงาน
           setImg_work(file);
-          setPreview_work(URL.createObjectURL(file));
-          setFileName_work(file.name);
+          setPreview_work(URL.createObjectURL(file)); // แสดงตัวอย่างรูปผลงาน
+          setFileName_work(file.name); // แสดงชื่อไฟล์
         } else {
+          // ถ้าขนาดเกินเกณฑ์ที่กำหนด
           alert("ขนาดรูปภาพต้องไม่เกิน 320x200 พิกเซล");
         }
       };
-      img.src = URL.createObjectURL(file);
+      img.src = URL.createObjectURL(file); // โหลดรูปเพื่อคำนวณขนาด
     } else {
+      // ถ้าไม่มีการเลือกไฟล์รูปใหม่ ให้รีเซ็ตตัวอย่างรูปและชื่อไฟล์
       setPreview_work(null);
       setFileName_work("โปรดเลือกรูป");
     }
   };
 
+  // ฟังก์ชันสำหรับจัดการเมื่อผู้ใช้กดส่งข้อมูล
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // ป้องกันการรีเฟรชหน้าเว็บ
 
+    // ตรวจสอบให้แน่ใจว่าทุกฟิลด์ได้รับการกรอกข้อมูล
     if (!name || !lastname || !personal_ip || !grade || !number_no || !department || !class_room || !party_policies || !party_details || !party_slogan || !img_profile || !img_work) {
-      alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+      alert("กรุณากรอกข้อมูลให้ครบถ้วน"); // แจ้งเตือนหากข้อมูลไม่ครบ
       return;
     }
 
+    // สร้าง FormData เพื่อส่งข้อมูลไปยัง API
     const formData = new FormData();
     formData.append("name", name);
     formData.append("lastname", lastname);
@@ -92,18 +106,19 @@ function CreatePostPage() {
     formData.append("img_work", img_work);
 
     try {
+      // ส่งข้อมูลไปยัง API สำหรับสร้างโพสต์ใหม่
       const res = await fetch("/api/election", {
         method: "POST",
-        body: formData,
+        body: formData, // ส่งข้อมูลที่บรรจุใน FormData
       });
 
       if (res.ok) {
-        router.push("/admin/management");
+        router.push("/admin/management"); // หากการส่งข้อมูลสำเร็จ เปลี่ยนไปที่หน้า /admin/management
       } else {
-        throw new Error("Failed to create a post");
+        throw new Error("ไม่สามารถสร้างโพสต์ได้"); // ถ้ามีข้อผิดพลาดในการส่งข้อมูล
       }
     } catch (error) {
-      console.log(error);
+      // ลบ console.log ที่ไม่จำเป็น
     }
   };
 
@@ -128,7 +143,7 @@ function CreatePostPage() {
                 placeholder="ป้อนชื่อจริง"
               />
             </div>
-
+  
             {/* ชื่อนามสกุล */}
             <div>
               <label className="block text-lg font-medium text-gray-700 mb-2">
@@ -142,7 +157,7 @@ function CreatePostPage() {
                 placeholder="ป้อนชื่อนามสกุล"
               />
             </div>
-
+  
             {/* เลขประจำตัว */}
             <div>
               <label className="block text-lg font-medium text-gray-700 mb-2">
@@ -156,7 +171,7 @@ function CreatePostPage() {
                 placeholder="ป้อนเลขประจำตัว"
               />
             </div>
-
+  
             {/* สาขาวิชา */}
             <div>
               <label className="block text-lg font-medium text-gray-700 mb-2">
@@ -191,7 +206,7 @@ function CreatePostPage() {
                 <option value="ธุรกิจค้าปลีก">แผนกวิชาธุรกิจค้าปลีก</option>
               </select>
             </div>
-
+  
             {/* ระดับชั้น */}
             <div>
               <label className="block text-lg font-medium text-gray-700 mb-2">
@@ -216,7 +231,7 @@ function CreatePostPage() {
                 </optgroup>
               </select>
             </div>
-
+  
             {/* ผลการเรียน */}
             <div>
               <label className="block text-lg font-medium text-gray-700 mb-2">
@@ -230,7 +245,7 @@ function CreatePostPage() {
                 placeholder="ป้อนผลการเรียน"
               />
             </div>
-
+  
             {/* เบอร์หมายเลข */}
             <div>
               <label className="block text-lg font-medium text-gray-700 mb-2">
@@ -251,17 +266,17 @@ function CreatePostPage() {
               />
             </div>
           </div>
-
+  
           <div className="space-y-8 mt-8">
-            {/* Input Row */}
+            {/* แถวอินพุต */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {/* Left Column: Input for รูปผลงานผู้สมัคร */}
+              {/* คอลัมน์ซ้าย: อินพุตสำหรับ รูปผลงานผู้สมัคร */}
               <div>
                 <label className="block text-lg font-medium text-gray-700 mb-2">
                   รูปผลงานผู้สมัคร
                   <span className="text-red_1-500 text-sm ml-2">
-                  *รูปขนาดไม่เกิน 320x200px
-                </span>
+                    *รูปขนาดไม่เกิน 320x200px
+                  </span>
                 </label>
                 <div className="flex items-center space-x-4">
                   <label
@@ -284,14 +299,14 @@ function CreatePostPage() {
                   </span>
                 </div>
               </div>
-
-              {/* Right Column: Input for รูปผู้สมัคร */}
+  
+              {/* คอลัมน์ขวา: อินพุตสำหรับ รูปผู้สมัคร */}
               <div>
                 <label className="block text-lg font-medium text-gray-700 mb-2">
                   รูปผู้สมัคร
                   <span className="text-red_1-500 text-sm ml-2">
-                  *รูปขนาดไม่เกิน 200x200px
-                </span>
+                    *รูปขนาดไม่เกิน 200x200px
+                  </span>
                 </label>
                 <div className="flex items-center space-x-4">
                   <label
@@ -315,10 +330,10 @@ function CreatePostPage() {
                 </div>
               </div>
             </div>
-
-            {/* Preview Row */}
+  
+            {/* แถวแสดงตัวอย่าง */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
-              {/* Left Column: Preview รูปผลงาน */}
+              {/* คอลัมน์ซ้าย: ดูตัวอย่าง รูปผลงาน */}
               {preview_work && (
                 <div className="text-center">
                   <p className="text-lg font-medium text-gray-700 mb-2">
@@ -333,8 +348,8 @@ function CreatePostPage() {
                   />
                 </div>
               )}
-
-              {/* Right Column: Preview รูปผู้สมัคร */}
+  
+              {/* คอลัมน์ด้านขวา: ดูตัวอย่าง รูปผู้สมัคร */}
               {preview_profile && (
                 <div className="text-center">
                   <p className="text-lg font-medium text-gray-700 mb-2">
@@ -351,8 +366,8 @@ function CreatePostPage() {
               )}
             </div>
           </div>
-
-          {/* นโยบายพรรค */}
+  
+          {/* สโลแกนพรรค */}
           <div>
             <label className="block text-lg font-medium text-gray-700 mb-2">
               สโลแกนพรรค
@@ -365,7 +380,7 @@ function CreatePostPage() {
               placeholder="ป้อนสโลแกนพรรค"
             />
           </div>
-
+  
           <div>
             <label className="block text-lg font-medium text-gray-700 mb-2">
               นโยบายพรรค
@@ -378,7 +393,7 @@ function CreatePostPage() {
               placeholder="ป้อนนโยบายพรรค"
             />
           </div>
-
+  
           {/* ข้อมูลพรรค */}
           <div>
             <label className="block text-lg font-medium text-gray-700 mb-2">
@@ -392,7 +407,7 @@ function CreatePostPage() {
               placeholder="ป้อนข้อมูลพรรค"
             />
           </div>
-
+  
           {/* ปุ่มส่งข้อมูล */}
           <div className="flex justify-between">
             <button
@@ -403,7 +418,7 @@ function CreatePostPage() {
             </button>
             <Link
               href="/admin/management"
-              className="bg-red hover:bg-red-600 text-white border py-3 px-6 rounded text-lg"
+              className="bg-red hover:bg-red_1-600 text-white border py-3 px-6 rounded text-lg"
             >
               ย้อนกลับ
             </Link>

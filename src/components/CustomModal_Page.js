@@ -26,7 +26,7 @@ const CustomModal = ({ isOpen, onClose, onConfirm }) => {
             </button>
             <button
               onClick={onConfirm}
-              className="bg-success text-white py-2 px-4 rounded-md hover:bg-red-600 transition"
+              className="bg-success text-white py-2 px-4 rounded-md hover:bg-red_1-600 transition"
             >
               ยืนยัน
             </button>

@@ -1,28 +1,29 @@
-import { connectMongoDB } from "../../../../lib/mongodb";
-import Scores from "../../../../models/scores_el";
-import { NextResponse } from 'next/server';
+import { connectMongoDB } from "../../../../lib/mongodb"; // เชื่อมต่อกับ MongoDB
+import Scores from "../../../../models/scores_el"; // นำเข้าโมเดล Scores
+import { NextResponse } from 'next/server'; // ใช้ NextResponse สำหรับการตอบกลับจาก API
 
 export async function GET() {
-  await connectMongoDB();
+  await connectMongoDB(); // เชื่อมต่อกับฐานข้อมูล MongoDB
 
-  // Aggregate counts by user_type
+  // คำนวณจำนวนข้อมูลตาม user_type
   const userTypeCounts = await Scores.aggregate([
-    { $group: { _id: "$user_type", count: { $sum: 1 } } },
-    { $project: { _id: 0, user_type: "$_id", count: 1 } }
+    { $group: { _id: "$user_type", count: { $sum: 1 } } }, // จัดกลุ่มตาม user_type และนับจำนวน
+    { $project: { _id: 0, user_type: "$_id", count: 1 } } // แสดงผลลัพธ์ให้แสดงแค่ user_type และ count
   ]);
 
-  // Aggregate counts by number_no
+  // คำนวณจำนวนข้อมูลตาม number_no
   const numberNoCounts = await Scores.aggregate([
-    { $group: { _id: "$number_no", count: { $sum: 1 } } },
-    { $project: { _id: 0, number_no: "$_id", count: 1 } }
+    { $group: { _id: "$number_no", count: { $sum: 1 } } }, // จัดกลุ่มตาม number_no และนับจำนวน
+    { $project: { _id: 0, number_no: "$_id", count: 1 } } // แสดงผลลัพธ์ให้แสดงแค่ number_no และ count
   ]);
 
-  // Total document count
+  // คำนวณจำนวนเอกสารทั้งหมดในฐานข้อมูล
   const totalDocumentCount = await Scores.countDocuments();
 
+  // ส่งผลลัพธ์กลับเป็น JSON
   return NextResponse.json({
-    userTypeCounts,
-    numberNoCounts,
-    totalDocumentCount,  // Return the total document count
+    userTypeCounts,        // จำนวนข้อมูลที่จัดกลุ่มตาม user_type
+    numberNoCounts,        // จำนวนข้อมูลที่จัดกลุ่มตาม number_no
+    totalDocumentCount,    // จำนวนเอกสารทั้งหมด
   });
 }

@@ -5,50 +5,50 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function ElectionPage() {
-  const [postData, setPostData] = useState([]); // Store the posts data
-  const [loading, setLoading] = useState(true); // Track loading state
-  const [countdown, setCountdown] = useState(""); // State to store the countdown timer
-  const [selectedImage, setSelectedImage] = useState(null); // State to manage selected image for modal
+  const [postData, setPostData] = useState([]); // เก็บข้อมูลของผู้สมัคร
+  const [loading, setLoading] = useState(true); // ใช้ติดตามสถานะการโหลดข้อมูล
+  const [countdown, setCountdown] = useState(""); // เก็บเวลานับถอยหลัง
+  const [selectedImage, setSelectedImage] = useState(null); // ใช้จัดการภาพที่เลือกสำหรับแสดงใน modal
 
-  // Use useEffect to fetch posts data when the component mounts
+  // ดึงข้อมูลผู้สมัครเมื่อ component โหลดเสร็จ
   useEffect(() => {
     const getPosts = async () => {
       try {
         const res = await fetch("/api/election", { cache: "no-store" });
 
         if (!res.ok) {
-          throw new Error("Failed to fetch posts");
+          throw new Error("ไม่สามารถดึงข้อมูลผู้สมัครได้");
         }
 
         const data = await res.json();
-        setPostData(data.posts); // Set the posts data to state
+        setPostData(data.posts); // เก็บข้อมูลของผู้สมัครใน state
       } catch (error) {
-        console.error("Error loading posts:", error);
+        console.error("เกิดข้อผิดพลาดในการโหลดข้อมูล:", error);
       } finally {
-        setLoading(false); // Set loading to false once data is fetched
+        setLoading(false); // เมื่อโหลดเสร็จแล้วจะตั้งค่า loading เป็น false
       }
     };
 
     getPosts();
-  }, []); // Empty dependency array to run once when the component mounts
+  }, []); // ทำงานแค่ครั้งแรกที่ component ถูกโหลด
 
-  // Function to calculate and update the countdown timer
+  // ฟังก์ชันคำนวณเวลาในการนับถอยหลัง
   const calculateCountdown = () => {
     const now = new Date();
-    const currentTime = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds(); // Convert current time to seconds
-    let targetTime = 8 * 3600; // 08:00:00 in seconds
+    const currentTime = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds(); // แปลงเวลาเป็นวินาที
+    let targetTime = 8 * 3600; // ตั้งเวลาเป้าหมายเป็น 08:00:00 ในหน่วยวินาที
 
     if (currentTime >= targetTime && currentTime < 15 * 3600) {
-      // If the current time is between 08:00 and 15:00, countdown to 15:00
+      // ถ้าเวลาปัจจุบันอยู่ระหว่าง 08:00 - 15:00 ให้ตั้งเป้าหมายเป็น 15:00
       targetTime = 15 * 3600;
     } else if (currentTime < targetTime) {
-      // If the current time is before 08:00, countdown to 08:00 of the same day
+      // ถ้าเวลาปัจจุบันก่อน 08:00 ให้ตั้งเป้าหมายเป็น 08:00
       targetTime = 8 * 3600;
     }
 
     const timeDifference = targetTime - currentTime;
     if (timeDifference <= 0) {
-      setCountdown("เวลาการเลือกตั้งเริ่มแล้ว!");
+      setCountdown("เวลาการเลือกตั้งหมดเวลาลงแล้ว!");
     } else {
       const hours = Math.floor(timeDifference / 3600);
       const minutes = Math.floor((timeDifference % 3600) / 60);
@@ -58,31 +58,31 @@ export default function ElectionPage() {
   };
 
   useEffect(() => {
-    // Start the countdown when the component mounts
+    // เริ่มต้นการนับถอยหลังเมื่อ component โหลด
     const countdownInterval = setInterval(calculateCountdown, 1000);
 
-    // Clean up the interval when the component unmounts
+    // ล้างการตั้งเวลาเมื่อ component ถูกทำลาย
     return () => clearInterval(countdownInterval);
   }, []);
 
-  // Function to handle opening the image in a modal
+  // ฟังก์ชันเปิด modal ภาพผู้สมัคร
   const openImageModal = (image) => {
     setSelectedImage(image);
   };
 
-  // Function to close the image modal
+  // ฟังก์ชันปิด modal ภาพ
   const closeImageModal = () => {
     setSelectedImage(null);
   };
 
-  // Show a loading message until the data is fetched
+  // แสดงข้อความโหลดข้อมูลจนกว่าจะได้รับข้อมูล
   if (loading) {
     return <div className="text-center text-gray-500">กำลังโหลดข้อมูล...</div>;
   }
 
   return (
     <div className="bg-gray-50 font-sans">
-      {/* Header */}
+      {/* ส่วนหัว */}
       <header className="bg-blue-700 text-white p-5">
         <div className="container mx-auto flex justify-between items-center">
           <div className="text-center">
@@ -98,20 +98,20 @@ export default function ElectionPage() {
         </div>
       </header>
 
-      {/* Main Content */}
+      {/* เนื้อหาหลัก */}
       <main className="py-10">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold text-center mb-6 text-black-500">
             เบอร์ผู้สมัครในการเลือกตั้ง
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Mapping through posts data */}
+            {/* การแสดงข้อมูลผู้สมัคร */}
             {postData.map((candidate) => (
               <div
                 key={candidate.id}
                 className="bg-white shadow-lg rounded-lg overflow-hidden flex flex-col"
               >
-                {/* Image with fixed height */}
+                {/* รูปภาพผู้สมัคร */}
                 <div className="relative h-64">
                   <Image
                     src={`/assets/election/profile/${candidate.img_profile}`}
@@ -134,23 +134,23 @@ export default function ElectionPage() {
         </div>
       </main>
 
-      {/* Countdown Timer */}
+      {/* เวลานับถอยหลัง */}
       <div className="fixed bottom-0 left-0 w-full bg-green-600 text-white text-center py-2 z-40">
         <p>เวลานับถอยหลังการเลือกตั้ง: {countdown}</p>
       </div>
 
-      {/* Image Modal (Lightbox) */}
+      {/* Modal สำหรับแสดงภาพผู้สมัคร */}
       {selectedImage && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="relative bg-white p-4 rounded-lg">
-            {/* Close button */}
+            {/* ปุ่มปิด modal */}
             <button
               onClick={closeImageModal}
-              className="absolute top-0 right-0 p-2 bg-red-600 text-white rounded-full"
+              className="absolute top-0 right-0 p-2 bg-red_1-600 text-white rounded-full"
             >
               X
             </button>
-            {/* Selected image */}
+            {/* รูปภาพที่เลือก */}
             <Image
               src={selectedImage}
               alt="Selected Candidate"

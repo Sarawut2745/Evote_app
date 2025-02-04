@@ -1,17 +1,19 @@
 // pages/api/background/[id].js
-import { connectMongoDB } from "../../../../../lib/mongodb";
-import Banner from "../../../../../models/banner";
-import { NextResponse } from "next/server";
-import path from "path";
-import { unlink } from "fs/promises";
+import { connectMongoDB } from "../../../../../lib/mongodb"; // นำเข้าฟังก์ชันเชื่อมต่อกับ MongoDB
+import Banner from "../../../../../models/banner"; // นำเข้าโมเดล Banner
+import { NextResponse } from "next/server"; // นำเข้า NextResponse สำหรับการส่งคำตอบ
+import path from "path"; // นำเข้า path สำหรับการจัดการกับเส้นทางไฟล์
+import { unlink } from "fs/promises"; // นำเข้า unlink สำหรับการลบไฟล์
 
+// ฟังก์ชัน DELETE สำหรับลบข้อมูล Banner ตาม ID
 export async function DELETE(req) {
   try {
-    const { id } = req.query; // รับ ID จาก query
+    const { id } = req.query; // รับค่า ID จาก query string
 
+    // ตรวจสอบว่าได้ส่ง ID มาไหม
     if (!id) {
       return NextResponse.json(
-        { error: "ID not provided" },
+        { error: "ไม่พบ ID" }, // ส่งข้อความผิดพลาดหากไม่มี ID
         { status: 400 }
       );
     }
@@ -22,23 +24,24 @@ export async function DELETE(req) {
     const banner = await Banner.findById(id);
     if (!banner) {
       return NextResponse.json(
-        { error: "Banner not found" },
+        { error: "ไม่พบข้อมูล Banner" }, // ส่งข้อความผิดพลาดหากไม่พบข้อมูล
         { status: 404 }
       );
     }
 
-    // ลบไฟล์ที่เกี่ยวข้อง
-    const filePath = path.join(process.cwd(), "public", banner.image);
-    await unlink(filePath); // ลบไฟล์ที่อัปโหลด
+    // ลบไฟล์ที่เกี่ยวข้องกับ Banner
+    const filePath = path.join(process.cwd(), "public", banner.image); // กำหนดเส้นทางไฟล์ที่ต้องการลบ
+    await unlink(filePath); // ลบไฟล์จากระบบ
 
-    // ลบข้อมูล Banner จาก MongoDB
+    // ลบข้อมูล Banner ออกจากฐานข้อมูล MongoDB
     await Banner.findByIdAndDelete(id);
 
-    return NextResponse.json({ message: "Banner deleted successfully" }, { status: 200 });
+    // ส่งข้อความยืนยันการลบข้อมูล Banner
+    return NextResponse.json({ message: "ลบ Banner สำเร็จ" }, { status: 200 });
   } catch (error) {
-    console.error("Error deleting Banner:", error);
+    // ส่งข้อความผิดพลาดหากเกิดข้อผิดพลาด
     return NextResponse.json(
-      { error: error.message },
+      { error: error.message }, // ส่งข้อความผิดพลาดจากข้อผิดพลาดที่เกิดขึ้น
       { status: 500 }
     );
   }

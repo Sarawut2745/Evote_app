@@ -33,7 +33,7 @@ function Navbar() {
               <button
                 onClick={handleLogout} // Call handleLogout on click
                 className="bg-white text-red px-4 py-2 rounded-md text-lg 
-                  shadow-md hover:bg-red-50 transition-all duration-300 
+                  shadow-md hover:bg-red_1-50 transition-all duration-300 
                   border-2 border-transparent hover:border-red
                   focus:outline-none focus:ring-2 focus:ring-red"
                 aria-label="Logout"

@@ -10,10 +10,10 @@ const RegisterPage = () => {
     posonal_number: "",
     user_type: "",
   });
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");  // สถานะข้อผิดพลาด
+  const [success, setSuccess] = useState("");  // สถานะสำเร็จ
 
-  // Define valid user types
+  // กำหนดประเภทของผู้ใช้ที่สามารถเลือกได้
   const USER_TYPES = [
     { value: "ปวช.1", label: "ปวช.1" },
     { value: "ปวช.2", label: "ปวช.2" },
@@ -32,15 +32,17 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
+    setError("");  // รีเซ็ตข้อความข้อผิดพลาด
+    setSuccess("");  // รีเซ็ตข้อความสำเร็จ
 
+    // ตรวจสอบให้แน่ใจว่ากรอกข้อมูลครบถ้วน
     if (!formData.name || !formData.posonal_number || !formData.user_type) {
       setError("กรุณากรอกข้อมูลให้ครบถ้วน");
       return;
     }
 
     try {
+      // ส่งข้อมูลไปยัง API สำหรับการลงทะเบียน
       const res = await fetch("/api/register", {
         method: "POST",
         headers: {
@@ -58,16 +60,16 @@ const RegisterPage = () => {
           posonal_number: "",
           user_type: "",
         });
-        // Clear success message after 5 seconds
+        // ล้างข้อความสำเร็จหลังจาก 5 วินาที
         setTimeout(() => setSuccess(""), 5000);
       } else {
         setError(data.message || "การเพิ่มล้มเหลว");
-        // Clear error message after 5 seconds
+        // ล้างข้อความข้อผิดพลาดหลังจาก 5 วินาที
         setTimeout(() => setError(""), 5000);
       }
     } catch (error) {
       setError("เกิดข้อผิดพลาดในการเพิ่ม: " + error.message);
-      // Clear error message after 5 seconds
+      // ล้างข้อความข้อผิดพลาดหลังจาก 5 วินาที
       setTimeout(() => setError(""), 5000);
     }
   };
@@ -80,11 +82,13 @@ const RegisterPage = () => {
             เพิ่มผู้ใช้งาน
           </h3>
           <form onSubmit={handleSubmit}>
+            {/* แสดงข้อผิดพลาดหากมี */}
             {error && (
               <div className="bg-red_1-500 text-white py-2 px-4 rounded mb-4 text-center">
                 {error}
               </div>
             )}
+            {/* แสดงข้อความสำเร็จหากการลงทะเบียนสำเร็จ */}
             {success && (
               <div className="bg-green-500 text-white py-2 px-4 rounded mb-4 text-center">
                 {success}

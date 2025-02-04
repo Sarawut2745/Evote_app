@@ -79,7 +79,7 @@ export default function UploadForm() {
             className={`mt-4 text-center text-lg ${
               message.includes("success")
                 ? "text-green-600"
-                : "text-red-600"
+                : "text-red_1-600"
             }`}
           >
             {message}

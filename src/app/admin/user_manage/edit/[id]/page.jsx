@@ -29,7 +29,7 @@ function EditUserPage() {
         const response = await fetch(`/api/user/${id}`);
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch user: ${response.statusText}`);
+          throw new Error(`ไม่สามารถดึงข้อมูลผู้ใช้ได้: ${response.statusText}`);
         }
 
         const user = await response.json();
@@ -40,7 +40,6 @@ function EditUserPage() {
         });
       } catch (err) {
         setError(err.message);
-        console.error("Fetch error:", err);
       } finally {
         setLoading(false);
       }
@@ -71,14 +70,13 @@ function EditUserPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update user");
+        throw new Error(errorData.error || "ไม่สามารถบันทึกการแก้ไขข้อมูลได้");
       }
 
       router.push("/admin/user_manage");
       router.refresh();
     } catch (err) {
       setError(err.message);
-      console.error("Error updating user:", err);
     }
   };
 
@@ -91,7 +89,7 @@ function EditUserPage() {
   if (loading) {
     return (
       <div className="p-6 flex justify-center items-center min-h-screen">
-        <div className="text-lg text-gray-600">Loading...</div>
+        <div className="text-lg text-gray-600">กำลังโหลด...</div>
       </div>
     );
   }
@@ -99,7 +97,7 @@ function EditUserPage() {
   if (error) {
     return (
       <div className="p-6 flex justify-center items-center min-h-screen">
-        <div className="text-lg text-red-500">Error: {error}</div>
+        <div className="text-lg text-red_1-500">ข้อผิดพลาด: {error}</div>
       </div>
     );
   }

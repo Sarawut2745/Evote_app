@@ -1,42 +1,37 @@
-import { NextResponse } from 'next/server';
-import { connectMongoDB } from '../../../../lib/mongodb';
-import User from '../../../../models/user';
+import { NextResponse } from 'next/server'; // ใช้ NextResponse สำหรับการตอบกลับจาก API
+import { connectMongoDB } from '../../../../lib/mongodb'; // เชื่อมต่อกับ MongoDB
+import User from '../../../../models/user'; // นำเข้าโมเดล User
 
 export async function POST(req) {
     try {
-        // Parse the request body
+        // แปลงข้อมูลที่มาจาก request body
         const { name, posonal_number, user_type } = await req.json();
 
-        // Log incoming request data
-        console.log("Request Data:", { name, posonal_number, user_type });
-
-        // Validate that name and posonal_number are provided
+        // ตรวจสอบว่า name และ posonal_number ถูกส่งมาหรือไม่
         if (!name || !posonal_number) {
-            return NextResponse.json({ message: "Name and posonal_number are required" }, { status: 400 });
+            return NextResponse.json({ message: "ชื่อและหมายเลขต้องถูกระบุ" }, { status: 400 }); // ถ้าไม่ครบส่งข้อความผิดพลาด
         }
 
-        // Connect to MongoDB
+        // เชื่อมต่อกับ MongoDB
         await connectMongoDB();
 
-        // Check if the user already exists
+        // ตรวจสอบว่าผู้ใช้มีอยู่แล้วหรือไม่
         const existingUser = await User.findOne({ name });
         if (existingUser) {
-            return NextResponse.json({ message: "User already exists" }, { status: 409 });
+            return NextResponse.json({ message: "ผู้ใช้นี้มีอยู่แล้ว" }, { status: 409 }); // หากมีผู้ใช้แล้วส่งข้อความผิดพลาด
         }
 
-        // Create the new user and log the result
+        // สร้างผู้ใช้ใหม่ในฐานข้อมูล
         const newUser = await User.create({
             name,
-            posonal_number,  // Ensure posonal_number is being passed correctly
-            user_type        // Optional field
+            posonal_number,  // ตรวจสอบให้แน่ใจว่า posonal_number ถูกส่งมาอย่างถูกต้อง
+            user_type        // ฟิลด์ที่เลือกได้
         });
 
-        console.log("User New:", JSON.stringify(newUser, null, 2));  // Log the new user
-
-        return NextResponse.json({ message: "User registered." }, { status: 201 });
+        return NextResponse.json({ message: "ลงทะเบียนผู้ใช้สำเร็จ" }, { status: 201 }); // ส่งข้อความยืนยันการลงทะเบียน
 
     } catch (error) {
-        console.error("Error registering user: ", error);
-        return NextResponse.json({ message: "An error occurred while registering the user." }, { status: 500 });
+        // หากเกิดข้อผิดพลาดในการลงทะเบียนผู้ใช้
+        return NextResponse.json({ message: "เกิดข้อผิดพลาดในการลงทะเบียนผู้ใช้" }, { status: 500 }); // ส่งข้อความผิดพลาด
     }
 }

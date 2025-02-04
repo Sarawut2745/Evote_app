@@ -63,7 +63,7 @@ const BannerItem = memo(({ background, index, onDeleteClick }) => (
       </Link>
       <button
         onClick={() => onDeleteClick(background._id)}
-        className="ml-4 text-red-600 hover:text-red-800 transition-colors"
+        className="ml-4 text-red_1-600 hover:text-red-800 transition-colors"
       >
         <FontAwesomeIcon icon={faTrashAlt} className="text-lg text-red"/>
       </button>
@@ -152,7 +152,7 @@ function Background() {
         {loading ? (
           <p className="text-center text-gray-500 text-xl">กำลังโหลดข้อมูล...</p>
         ) : error ? (
-          <p className="text-center text-red-500 text-xl">{error}</p>
+          <p className="text-center text-red_1-500 text-xl">{error}</p>
         ) : (
           <div className="overflow-x-auto bg-white shadow-lg rounded-lg p-4">
             <table className="w-full table-auto border-collapse">
