@@ -7,6 +7,8 @@ import Link from "next/link";
 export default function ElectionPage() {
   const [postData, setPostData] = useState([]); // Store the posts data
   const [loading, setLoading] = useState(true); // Track loading state
+  const [countdown, setCountdown] = useState(""); // State to store the countdown timer
+  const [selectedImage, setSelectedImage] = useState(null); // State to manage selected image for modal
 
   // Use useEffect to fetch posts data when the component mounts
   useEffect(() => {
@@ -29,6 +31,49 @@ export default function ElectionPage() {
 
     getPosts();
   }, []); // Empty dependency array to run once when the component mounts
+
+  // Function to calculate and update the countdown timer
+  const calculateCountdown = () => {
+    const now = new Date();
+    const currentTime = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds(); // Convert current time to seconds
+    let targetTime = 8 * 3600; // 08:00:00 in seconds
+
+    if (currentTime >= targetTime && currentTime < 15 * 3600) {
+      // If the current time is between 08:00 and 15:00, countdown to 15:00
+      targetTime = 15 * 3600;
+    } else if (currentTime < targetTime) {
+      // If the current time is before 08:00, countdown to 08:00 of the same day
+      targetTime = 8 * 3600;
+    }
+
+    const timeDifference = targetTime - currentTime;
+    if (timeDifference <= 0) {
+      setCountdown("เวลาการเลือกตั้งเริ่มแล้ว!");
+    } else {
+      const hours = Math.floor(timeDifference / 3600);
+      const minutes = Math.floor((timeDifference % 3600) / 60);
+      const seconds = timeDifference % 60;
+      setCountdown(`${hours} ชั่วโมง ${minutes} นาที ${seconds} วินาที`);
+    }
+  };
+
+  useEffect(() => {
+    // Start the countdown when the component mounts
+    const countdownInterval = setInterval(calculateCountdown, 1000);
+
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(countdownInterval);
+  }, []);
+
+  // Function to handle opening the image in a modal
+  const openImageModal = (image) => {
+    setSelectedImage(image);
+  };
+
+  // Function to close the image modal
+  const closeImageModal = () => {
+    setSelectedImage(null);
+  };
 
   // Show a loading message until the data is fetched
   if (loading) {
@@ -73,7 +118,8 @@ export default function ElectionPage() {
                     alt={candidate.name}
                     layout="fill"
                     objectFit="cover"
-                    className="w-full h-full"
+                    className="w-full h-full cursor-pointer"
+                    onClick={() => openImageModal(`/assets/election/profile/${candidate.img_profile}`)}
                   />
                 </div>
                 <div className="p-6 flex-grow">
@@ -88,12 +134,33 @@ export default function ElectionPage() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-blue-700 text-white py-4">
-        <div className="container mx-auto text-center">
-          <p>&copy; 2025 การเลือกตั้งไทย - ทุกสิทธิ์สงวนไว้</p>
+      {/* Countdown Timer */}
+      <div className="fixed bottom-0 left-0 w-full bg-green-600 text-white text-center py-2 z-40">
+        <p>เวลานับถอยหลังการเลือกตั้ง: {countdown}</p>
+      </div>
+
+      {/* Image Modal (Lightbox) */}
+      {selectedImage && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="relative bg-white p-4 rounded-lg">
+            {/* Close button */}
+            <button
+              onClick={closeImageModal}
+              className="absolute top-0 right-0 p-2 bg-red-600 text-white rounded-full"
+            >
+              X
+            </button>
+            {/* Selected image */}
+            <Image
+              src={selectedImage}
+              alt="Selected Candidate"
+              width={800}
+              height={800}
+              objectFit="contain"
+            />
+          </div>
         </div>
-      </footer>
+      )}
     </div>
   );
 }

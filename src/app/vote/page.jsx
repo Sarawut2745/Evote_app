@@ -14,8 +14,42 @@ export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [isNoVote, setIsNoVote] = useState(false);
+  const [countdown, setCountdown] = useState(""); // State to store the countdown timer
 
   const { data: session, status } = useSession();
+
+
+  const calculateCountdown = () => {
+    const now = new Date();
+    const currentTime = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds(); // Convert current time to seconds
+    let targetTime = 8 * 3600; // 08:00:00 in seconds
+
+    if (currentTime >= targetTime && currentTime < 15 * 3600) {
+      // If the current time is between 08:00 and 15:00, countdown to 15:00
+      targetTime = 15 * 3600;
+    } else if (currentTime < targetTime) {
+      // If the current time is before 08:00, countdown to 08:00 of the same day
+      targetTime = 8 * 3600;
+    }
+
+    const timeDifference = targetTime - currentTime;
+    if (timeDifference <= 0) {
+      setCountdown("เวลาการเลือกตั้งเริ่มแล้ว!");
+    } else {
+      const hours = Math.floor(timeDifference / 3600);
+      const minutes = Math.floor((timeDifference % 3600) / 60);
+      const seconds = timeDifference % 60;
+      setCountdown(`${hours} ชั่วโมง ${minutes} นาที ${seconds} วินาที`);
+    }
+  };
+
+  useEffect(() => {
+    // Start the countdown when the component mounts
+    const countdownInterval = setInterval(calculateCountdown, 1000);
+
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(countdownInterval);
+  }, []);
 
   useEffect(() => {
     const getPosts = async () => {
@@ -150,6 +184,11 @@ export default function Home() {
             </p>
           )}
         </div>
+
+          {/* Countdown Timer */}
+      <div className="fixed bottom-0 left-0 w-full bg-green-600 text-white text-center py-2 z-40">
+        <p>เวลานับถอยหลังการเลือกตั้ง: {countdown}</p>
+      </div>
 
         <Footer />
 

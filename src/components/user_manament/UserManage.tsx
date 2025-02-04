@@ -118,7 +118,6 @@ function UserManage() {
       </div>
 
       <div className="mb-6 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 md:space-x-4">
-        {/* Search Section */}
         <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 max-w-lg bg-white border border-gray-300 rounded-lg shadow-md p-4 w-full md:w-auto">
           <input
             className="flex-1 bg-white border border-gray-300 text-gray-700 placeholder-gray-500 py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -138,14 +137,22 @@ function UserManage() {
           </div>
         </div>
 
-        {/* Add New User Button */}
-        <Link
-          className="btn bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg shadow-sm transition duration-150 ease-in-out"
-          href="/admin/user_manage/create"
-        >
-          <FontAwesomeIcon icon={faPlus} className="mr-2" />
-          เพิ่มผู้สมัคร
-        </Link>
+        <div className="flex space-x-4">
+          <Link
+            className="btn bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg shadow-sm transition duration-150 ease-in-out"
+            href="/admin/user_manage/create"
+          >
+            <FontAwesomeIcon icon={faPlus} className="mr-2" />
+            เพิ่มผู้สมัคร
+          </Link>
+          <Link
+            className="btn bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg shadow-sm transition duration-150 ease-in-out"
+            href="/admin/user_manage/import"
+          >
+            <FontAwesomeIcon icon={faPlus} className="mr-2" />
+            นำเข้า Excel
+          </Link>
+        </div>
       </div>
 
       {/* Table Section */}
