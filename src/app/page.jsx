@@ -1,16 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { useState, useEffect, useRef } from "react";
 
-export default function ElectionPage() {
-  const [postData, setPostData] = useState([]); // เก็บข้อมูลของผู้สมัคร
-  const [loading, setLoading] = useState(true); // ใช้ติดตามสถานะการโหลดข้อมูล
-  const [countdown, setCountdown] = useState(""); // เก็บเวลานับถอยหลัง
-  const [selectedImage, setSelectedImage] = useState(null); // ใช้จัดการภาพที่เลือกสำหรับแสดงใน modal
+export default function Home() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const slideInterval = useRef(null);
+  const [postData, setPostData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // ดึงข้อมูลผู้สมัครเมื่อ component โหลดเสร็จ
   useEffect(() => {
     const getPosts = async () => {
       try {
@@ -21,146 +19,249 @@ export default function ElectionPage() {
         }
 
         const data = await res.json();
-        setPostData(data.posts); // เก็บข้อมูลของผู้สมัครใน state
+        setPostData(data.posts);
       } catch (error) {
         console.error("เกิดข้อผิดพลาดในการโหลดข้อมูล:", error);
       } finally {
-        setLoading(false); // เมื่อโหลดเสร็จแล้วจะตั้งค่า loading เป็น false
+        setLoading(false);
       }
     };
 
     getPosts();
-  }, []); // ทำงานแค่ครั้งแรกที่ component ถูกโหลด
+  }, []);
 
-  // ฟังก์ชันคำนวณเวลาในการนับถอยหลัง
-  const calculateCountdown = () => {
-    const now = new Date();
-    const currentTime = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds(); // แปลงเวลาเป็นวินาที
-    let targetTime = 8 * 3600; // ตั้งเวลาเป้าหมายเป็น 08:00:00 ในหน่วยวินาที
+  const slides = [
+    { image: "/images/slide/slide1.jpg" },
+    { image: "/images/slide/slide2.jpg" },
+    { image: "/images/slide/slide3.jpg" },
+    { image: "/images/slide/slide4.jpg" },
+    { image: "/images/slide/slide5.jpg" },
+    { image: "/images/slide/slide6.jpg" },
+    { image: "/images/slide/slide7.jpg" },
+    { image: "/images/slide/slide8.jpg" },
+    { image: "/images/slide/slide9.jpg" },
+  ];
 
-    if (currentTime >= targetTime && currentTime < 15 * 3600) {
-      // ถ้าเวลาปัจจุบันอยู่ระหว่าง 08:00 - 15:00 ให้ตั้งเป้าหมายเป็น 15:00
-      targetTime = 15 * 3600;
-    } else if (currentTime < targetTime) {
-      // ถ้าเวลาปัจจุบันก่อน 08:00 ให้ตั้งเป้าหมายเป็น 08:00
-      targetTime = 8 * 3600;
-    }
+  const moveSlide = (direction) => {
+    setCurrentSlide(
+      (prev) => (prev + direction + slides.length) % slides.length
+    );
+  };
 
-    const timeDifference = targetTime - currentTime;
-    if (timeDifference <= 0) {
-      setCountdown("เวลาการเลือกตั้งหมดเวลาลงแล้ว!");
-    } else {
-      const hours = Math.floor(timeDifference / 3600);
-      const minutes = Math.floor((timeDifference % 3600) / 60);
-      const seconds = timeDifference % 60;
-      setCountdown(`${hours} ชั่วโมง ${minutes} นาที ${seconds} วินาที`);
-    }
+  const goToSlide = (slideIndex) => {
+    setCurrentSlide(slideIndex);
   };
 
   useEffect(() => {
-    // เริ่มต้นการนับถอยหลังเมื่อ component โหลด
-    const countdownInterval = setInterval(calculateCountdown, 1000);
+    const startAutoPlay = () => {
+      if (slideInterval.current) {
+        clearInterval(slideInterval.current);
+      }
+      slideInterval.current = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % slides.length);
+      }, 5000);
+    };
 
-    // ล้างการตั้งเวลาเมื่อ component ถูกทำลาย
-    return () => clearInterval(countdownInterval);
+    startAutoPlay();
+
+    return () => {
+      clearInterval(slideInterval.current);
+    };
   }, []);
 
-  // ฟังก์ชันเปิด modal ภาพผู้สมัคร
-  const openImageModal = (image) => {
-    setSelectedImage(image);
+  const pauseSlider = () => {
+    clearInterval(slideInterval.current);
   };
 
-  // ฟังก์ชันปิด modal ภาพ
-  const closeImageModal = () => {
-    setSelectedImage(null);
+  const resumeSlider = () => {
+    slideInterval.current = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
   };
-
-  // แสดงข้อความโหลดข้อมูลจนกว่าจะได้รับข้อมูล
-  if (loading) {
-    return <div className="text-center text-gray-500">กำลังโหลดข้อมูล...</div>;
-  }
 
   return (
-    <div className="bg-gray-50 font-sans">
-      {/* ส่วนหัว */}
-      <header className="bg-blue-700 text-white p-5">
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="text-center">
-            <h1 className="text-3xl font-semibold">การเลือกตั้ง 2025</h1>
-            <p>โปรดเลือกผู้สมัครที่คุณเชื่อมั่น</p>
-          </div>
-          <Link
-            className="bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold"
-            href={`/login`}
-          >
-            Login
-          </Link>
+    <div className="min-h-screen bg-gray-100">
+      {/* Header */}
+      <header className="bg-white shadow p-4 flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Image src="/images/logo.png" alt="Logo" width={50} height={50} />
+          <h1 className="text-lg font-semibold">
+            การเลือกตั้งวิทยาลัย อาชีวศึกษา สุพรรณบุรี
+          </h1>
         </div>
+        <nav>
+          <ul className="flex space-x-4 text-gray-700">
+            <li>
+              <a href="/" className="hover:text-blue-500">
+                หน้าหลัก
+              </a>
+            </li>
+            <li>
+              <a href="#" className="hover:text-blue-500">
+                ข้อมูลผู้สมัคร
+              </a>
+            </li>
+            <li>
+              <a href="/login" className="hover:text-blue-500">
+                เข้าสู่ระบบ
+              </a>
+            </li>
+          </ul>
+        </nav>
       </header>
 
-      {/* เนื้อหาหลัก */}
-      <main className="py-10">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold text-center mb-6 text-black-500">
-            เบอร์ผู้สมัครในการเลือกตั้ง
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* การแสดงข้อมูลผู้สมัคร */}
-            {postData.map((candidate) => (
-              <div
-                key={candidate.id}
-                className="bg-white shadow-lg rounded-lg overflow-hidden flex flex-col"
-              >
-                {/* รูปภาพผู้สมัคร */}
-                <div className="relative h-64">
+      {/* Hero Section */}
+      <div className="relative">
+        <Image
+          src="/images/banner.jpg"
+          alt="Voting Banner"
+          layout="responsive"
+          width={1500}
+          height={500}
+        />
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center">
+          <h2 className="text-3xl font-bold">ยินดีต้อนรับ</h2>
+          <p className="mt-2 text-lg">
+            เพิ่มความสะดวกสบายในการเลือกตั้งภายในวิทยาลัย
+          </p>
+          <a href="/login">
+            <button className="mt-4 bg-blue-600 px-6 py-2 rounded text-white hover:bg-blue-700">
+              เข้าสู่ระบบ
+            </button>
+          </a>
+        </div>
+      </div>
+
+      {/* About Section */}
+      <section className="py-16 text-center bg-white">
+        <h2 className="text-3xl font-bold">เกี่ยวกับ</h2>
+
+        <div
+          className="relative max-w-5xl mx-auto mt-8 overflow-hidden"
+          onMouseEnter={pauseSlider}
+          onMouseLeave={resumeSlider}
+        >
+          {/* Slider container */}
+          <div
+            className="flex transition-transform duration-500 ease-in-out"
+            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+          >
+            {slides.map((slide, index) => (
+              <div key={index} className="min-w-full p-4">
+                <div className="relative w-full h-64">
                   <Image
-                    src={`/assets/election/profile/${candidate.img_profile}`}
-                    alt={candidate.name}
-                    layout="fill"
-                    objectFit="cover"
-                    className="w-full h-full cursor-pointer"
-                    onClick={() => openImageModal(`/assets/election/profile/${candidate.img_profile}`)}
+                    src={slide.image}
+                    alt={slide.title}
+                    fill
+                    className="object-cover rounded-lg shadow-md"
                   />
-                </div>
-                <div className="p-6 flex-grow">
-                  <h3 className="text-xl font-semibold text-gray-800">
-                    {candidate.name + " " + candidate.lastname}
-                  </h3>
-                  <p className="text-gray-600">{candidate.party_slogan}</p>
                 </div>
               </div>
             ))}
           </div>
-        </div>
-      </main>
 
-      {/* เวลานับถอยหลัง */}
-      <div className="fixed bottom-0 left-0 w-full bg-green-600 text-white text-center py-2 z-40">
-        <p>เวลานับถอยหลังการเลือกตั้ง: {countdown}</p>
-      </div>
-
-      {/* Modal สำหรับแสดงภาพผู้สมัคร */}
-      {selectedImage && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="relative bg-white p-4 rounded-lg">
-            {/* ปุ่มปิด modal */}
-            <button
-              onClick={closeImageModal}
-              className="absolute top-0 right-0 p-2 bg-red_1-600 text-white rounded-full"
+          {/* Navigation buttons */}
+          <button
+            className="absolute left-0 top-1/2 -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-100 p-2 rounded-r-lg shadow-md focus:outline-none"
+            onClick={() => moveSlide(-1)}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              X
-            </button>
-            {/* รูปภาพที่เลือก */}
-            <Image
-              src={selectedImage}
-              alt="Selected Candidate"
-              width={800}
-              height={800}
-              objectFit="contain"
-            />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+
+          <button
+            className="absolute right-0 top-1/2 -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-100 p-2 rounded-l-lg shadow-md focus:outline-none"
+            onClick={() => moveSlide(1)}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+
+          {/* Dots navigation */}
+          <div className="flex justify-center mt-4">
+            {slides.map((_, index) => (
+              <button
+                key={index}
+                className={`mx-1 w-3 h-3 rounded-full ${
+                  currentSlide === index ? "bg-gray-800" : "bg-gray-400"
+                }`}
+                onClick={() => goToSlide(index)}
+              ></button>
+            ))}
           </div>
         </div>
-      )}
+
+        {/* เนื้อหาส่วนอื่นๆ ของหน้า About */}
+      </section>
+
+      {/* Candidates Section */}
+      {/* Candidates Section */}
+      <section className="py-16 bg-blue-50 text-center">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold text-gray-800">ผู้สมัคร</h2>
+          <p className="mt-2 text-lg text-gray-600">
+            องค์การนักวิชาชีพในอนาคตแห่งประเทศไทย
+          </p>
+        </div>
+        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 px-4 md:px-8">
+          {postData
+            .sort((a, b) => a.number_no - b.number_no) // Sort candidates by number_no
+            .map((candidate) => (
+              <div
+                key={candidate.id}
+                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow"
+              >
+                <div className="relative w-full h-60">
+                  <Image
+                    src={`/assets/election/profile/${candidate.img_profile}`} // ใช้รูปภาพจากข้อมูลผู้สมัคร
+                    alt={candidate.name}
+                    layout="fill"
+                    objectFit="cover"
+                  />
+                  <div className="absolute top-0 left-0 bg-yellow-500 text-white text-4xl font-bold p-2">
+                    {candidate.number_no} {/* เบอร์ผู้สมัคร */}
+                  </div>
+                </div>
+                <div className="p-4 text-left">
+                  <h3 className="text-lg font-semibold text-gray-800">{`เบอร์ ${candidate.number_no}`}</h3>
+                  <p className="text-sm text-gray-600">
+                    {candidate.name} {candidate.lastname}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    ชมรมวิชาชีพ{candidate.department}
+                  </p>
+                  <p className="mt-2 text-sm text-gray-700 italic">
+                    {`"${candidate.party_slogan}"`} {/* คำขวัญ */}
+                  </p>
+                </div>
+              </div>
+            ))}
+        </div>
+      </section>
     </div>
   );
 }

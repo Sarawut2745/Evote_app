@@ -9,9 +9,10 @@ const RegisterPage = () => {
     name: "",
     posonal_number: "",
     user_type: "",
+    vote_status: 0, // เพิ่ม vote_status ด้วยค่าเริ่มต้นเป็น 0
   });
-  const [error, setError] = useState("");  // สถานะข้อผิดพลาด
-  const [success, setSuccess] = useState("");  // สถานะสำเร็จ
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   // กำหนดประเภทของผู้ใช้ที่สามารถเลือกได้
   const USER_TYPES = [
@@ -32,8 +33,8 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");  // รีเซ็ตข้อความข้อผิดพลาด
-    setSuccess("");  // รีเซ็ตข้อความสำเร็จ
+    setError("");
+    setSuccess("");
 
     // ตรวจสอบให้แน่ใจว่ากรอกข้อมูลครบถ้วน
     if (!formData.name || !formData.posonal_number || !formData.user_type) {
@@ -48,7 +49,7 @@ const RegisterPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData), // ส่ง vote_status ในข้อมูลด้วย
       });
 
       const data = await res.json();
@@ -59,6 +60,7 @@ const RegisterPage = () => {
           name: "",
           posonal_number: "",
           user_type: "",
+          vote_status: 0, // รีเซ็ตค่า vote_status
         });
         // ล้างข้อความสำเร็จหลังจาก 5 วินาที
         setTimeout(() => setSuccess(""), 5000);
@@ -127,6 +129,18 @@ const RegisterPage = () => {
                     {type.label}
                   </option>
                 ))}
+              </select>
+            </div>
+            {/* เพิ่มฟิลด์สำหรับกำหนด vote_status (อาจจะไม่ต้องแสดงให้ผู้ใช้เห็นหรือสร้างเป็น checkbox) */}
+            <div className="mb-4">
+              <select
+                name="vote_status"
+                value={formData.vote_status}
+                onChange={handleChange}
+                hidden
+              >
+                <option value="0">ยังไม่ได้โหวต (0)</option>
+                <option value="1">โหวตแล้ว (1)</option>
               </select>
             </div>
             <div className="flex justify-between gap-4">

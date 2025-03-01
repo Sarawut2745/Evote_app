@@ -20,6 +20,7 @@
     "flowbite": "^2.5.1",
     "flowbite-react": "^0.10.1",
     "formidable": "^3.5.2",
+    "framer-motion": "^12.4.7",
     "jsvectormap": "^1.6.0",
     "lucide-react": "^0.439.0",
     "mongoose": "^8.5.0",
@@ -33,7 +34,9 @@
     "react-easy-crop": "^5.0.8",
     "react-image-crop": "^11.0.7",
     "react-modal": "^3.16.1",
+    "react-slick": "^0.30.3",
     "react-transition-group": "^4.4.5",
+    "slick-carousel": "^1.8.1",
     "swiper": "^11.1.15",
     "xlsx": "^0.18.5"
   },

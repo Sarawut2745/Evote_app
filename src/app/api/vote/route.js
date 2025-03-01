@@ -1,36 +1,43 @@
-import { NextResponse } from 'next/server'; // ใช้ NextResponse สำหรับการตอบกลับจาก API
-import { connectMongoDB } from '../../../../lib/mongodb'; // เชื่อมต่อกับ MongoDB
-import Scores from '../../../../models/scores_el'; // นำเข้าโมเดล Scores
-import User from '../../../../models/user'; // นำเข้าโมเดล User
+import { NextResponse } from "next/server";
+import { connectMongoDB } from "../../../../lib/mongodb";
+import Scores from "../../../../models/scores_el";
+import User from "../../../../models/user";
 
-// ฟังก์ชัน POST สำหรับเพิ่มคะแนน
 export async function POST(req) {
   try {
-    // รับข้อมูลจากคำขอที่ส่งมาในรูปแบบ JSON
-    const { user_type, number_no } = await req.json();
+    const body = await req.json();
+    console.log("Request Body:", body); // ตรวจสอบข้อมูลที่ได้รับ
 
-    // เชื่อมต่อกับ MongoDB
+    const { user_type, number_no } = body;
+    if (!user_type || !number_no) {
+      return NextResponse.json({ message: "ข้อมูลไม่ครบ" }, { status: 400 });
+    }
+
     await connectMongoDB();
 
-    // สร้างคะแนนใหม่ในฐานข้อมูล
+    // บันทึกคะแนน
     await Scores.create({ user_type, number_no });
 
-    // ส่งข้อความตอบกลับว่าเพิ่มคะแนนสำเร็จ
-    return NextResponse.json({ message: 'เพิ่มคะแนนสำเร็จ' }, { status: 201 });
+    // ค้นหาและอัปเดต vote_status ของผู้ใช้
+    const updatedUser = await User.findOneAndUpdate(
+      { user_type }, // ค้นหาตาม user_type
+      { $set: { vote_status: 1 } }, // อัปเดตค่า vote_status เป็น 1
+      { new: true } // คืนค่าข้อมูลที่อัปเดตแล้ว
+    );
+
+    if (!updatedUser) {
+      return NextResponse.json({ message: "ไม่พบผู้ใช้สำหรับอัปเดต" }, { status: 404 });
+    }
+
+    return NextResponse.json(
+      { message: "เพิ่มคะแนนสำเร็จ", user: updatedUser },
+      { status: 201 }
+    );
   } catch (error) {
-    // ถ้ามีข้อผิดพลาดเกิดขึ้น ส่งข้อความข้อผิดพลาด
-    return NextResponse.json({ message: 'เกิดข้อผิดพลาดขณะเพิ่มคะแนน' }, { status: 500 });
+    console.error("Error:", error);
+    return NextResponse.json(
+      { message: "เกิดข้อผิดพลาดขณะเพิ่มคะแนน", error: error.message },
+      { status: 500 }
+    );
   }
-}
-
-// ฟังก์ชัน GET สำหรับดึงข้อมูลผู้ใช้ทั้งหมด
-export async function GET() {
-  // เชื่อมต่อกับ MongoDB
-  await connectMongoDB();
-
-  // ดึงข้อมูลผู้ใช้ทั้งหมด
-  const user = await User.find({});
-
-  // ส่งข้อมูลผู้ใช้ทั้งหมดกลับมา
-  return NextResponse.json({ user });
 }

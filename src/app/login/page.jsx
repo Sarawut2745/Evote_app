@@ -1,5 +1,4 @@
-"use client";
-
+"use client"
 import React, { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
@@ -12,6 +11,7 @@ function LoginPage() {
   const [posonal_number, setPosonalNumber] = useState(""); // กำหนดค่าเริ่มต้นให้กับตัวแปรรหัสผ่าน
   const [error, setError] = useState(""); // กำหนดค่าเริ่มต้นให้กับข้อความข้อผิดพลาด
   const [isLoading, setIsLoading] = useState(false); // กำหนดค่าเริ่มต้นให้กับตัวแปรที่ใช้ในการเช็คสถานะการโหลด
+  const [successMessage, setSuccessMessage] = useState(""); // กำหนดค่าเริ่มต้นให้กับข้อความแจ้งเตือนความสำเร็จ
 
   const router = useRouter(); // ใช้เพื่อการนำทางไปยังหน้าต่างๆ
   const { data: session, status } = useSession(); // ใช้ข้อมูล session และสถานะการเข้าสู่ระบบจาก next-auth
@@ -41,15 +41,16 @@ function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault(); // ป้องกันการรีเฟรชหน้าจอเมื่อฟอร์มถูกส่ง
     setError(""); // เคลียร์ข้อความข้อผิดพลาดเมื่อมีการส่งฟอร์มใหม่
+    setSuccessMessage(""); // เคลียร์ข้อความความสำเร็จ
     setIsLoading(true); // ตั้งค่าการโหลดเป็น true
-
+  
     // ตรวจสอบว่าผู้ใช้กรอกชื่อและรหัสผ่านหรือยัง
     if (!name || !posonal_number) {
       setError("กรุณากรอกชื่อและรหัสผ่าน"); // หากยังไม่กรอกให้แสดงข้อผิดพลาด
       setIsLoading(false); // ตั้งค่าการโหลดเป็น false เมื่อกรอกข้อมูลไม่ครบ
       return;
     }
-
+  
     try {
       // ใช้ฟังก์ชัน signIn จาก next-auth เพื่อเข้าสู่ระบบ
       const res = await signIn("credentials", {
@@ -57,21 +58,24 @@ function LoginPage() {
         posonal_number, // ส่งข้อมูลรหัสผ่านแทน
         redirect: false, // ไม่ให้รีไดเร็กต์อัตโนมัติ
       });
-
+  
       // หากการเข้าสู่ระบบไม่สำเร็จ ให้แสดงข้อความข้อผิดพลาด
       if (res?.error) {
-        setError("ไม่พบผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
+        setError("ผู้ใช้ไม่สามารถเข้าสู่ระบบได้");
         setIsLoading(false); // ตั้งค่าการโหลดเป็น false
         return;
       }
-
+  
       // การรีไดเร็กต์จะถูกจัดการโดย useEffect ที่ตรวจสอบ session
+      setSuccessMessage("เข้าสู่ระบบสำเร็จ!"); // เพิ่มข้อความแจ้งเตือนความสำเร็จ
+  
     } catch (error) {
       console.log(error); // แสดงข้อผิดพลาดในคอนโซล
       setError("เกิดข้อผิดพลาดในการเข้าสู่ระบบ"); // แสดงข้อความข้อผิดพลาด
       setIsLoading(false); // ตั้งค่าการโหลดเป็น false
     }
   };
+  
 
   return (
     <div className="flex flex-col min-h-screen relative">
@@ -153,6 +157,12 @@ function LoginPage() {
           {error && (
             <p className="text-red_1-500 text-center mt-3 text-sm sm:text-base">
               {error} {/* แสดงข้อความข้อผิดพลาดหากมี */}
+            </p>
+          )}
+  
+          {successMessage && (
+            <p className="text-green-500 text-center mt-3 text-sm sm:text-base">
+              {successMessage} {/* แสดงข้อความแจ้งเตือนความสำเร็จ */}
             </p>
           )}
         </div>

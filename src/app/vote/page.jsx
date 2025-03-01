@@ -91,7 +91,7 @@ export default function Home() {
       if (res.ok) {
         console.log("ลงคะแนนเรียบร้อยแล้ว");
         closeModal();
-        await signOut({ redirect: false }); // ออกจากระบบหลังจากลงคะแนน
+        await signOut({ redirect: true, callbackUrl: "/" });
       } else {
         console.error("ไม่สามารถลงคะแนนได้");
       }

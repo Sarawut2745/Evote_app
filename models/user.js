@@ -1,27 +1,15 @@
 import mongoose, { Schema } from "mongoose";
 
-const userSchema = new Schema(
-    {
-        name: {
-            type: String,
-            required: true
-        },
-        posonal_number: {
-            type: String,  // Ensure the field type is correct
-            required: true  // Make sure it's required if that's the case
-        },
-        user_type: {
-            type: String,
-        },
-        role: {
-            type: String,
-            required: false,
-            default: "user"
-        },
-    },
-    { timestamps: true }
-)
+const userSchema = new Schema({
+    name: { type: String, required: true },
+    posonal_number: { type: String, required: true, unique: true },
+    user_type: { type: String, required: true },
+    vote_status: { type: Number, required: true }, // เปลี่ยนเป็น required
+    role: { type: String, default: "user" },
+}, { timestamps: true });
 
+// ล้างโมเดลเดิมออกก่อนถ้ามีการกำหนดไว้แล้ว
+mongoose.models = {};
 
-const User = mongoose.models.User || mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
 export default User;

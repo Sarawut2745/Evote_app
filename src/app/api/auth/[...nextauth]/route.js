@@ -16,8 +16,8 @@ const authOptions = {
 
         // ตรวจสอบว่ามีการกรอกข้อมูลครบถ้วนหรือไม่
         if (!name || !posonal_number) {
-          console.error("Username or posonal_number is missing");  // ถ้าไม่ครบถ้วนจะแสดงข้อความผิดพลาด
-          return null;
+          console.error("ชื่อผู้ใช้หรือรหัสผ่านไม่ครบถ้วน");  // ถ้าไม่ครบถ้วนจะแสดงข้อความผิดพลาด
+          throw new Error("กรุณากรอกชื่อและรหัสผ่าน");
         }
 
         try {
@@ -28,20 +28,26 @@ const authOptions = {
 
           // ถ้าผู้ใช้ไม่พบ ให้คืนค่า null
           if (!user) {
-            console.error("User not found");
-            return null;
+            console.error("ไม่พบผู้ใช้");
+            throw new Error("ไม่พบผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
           }
 
           // ตรวจสอบว่าในฐานข้อมูลมี posonal_number หรือไม่
           if (!user.posonal_number) {
-            console.error("Posonal number missing in database");
-            return null;
+            console.error("ไม่พบข้อมูลรหัสผ่านในฐานข้อมูล");
+            throw new Error("ไม่พบข้อมูลรหัสผ่านในฐานข้อมูล");
+          }
+
+          // ตรวจสอบว่า `vote_status` เป็นค่า 1 หรือไม่
+          if (user.vote_status === 1) {
+            console.error("ผู้ใช้ไม่สามารถเข้าสู่ระบบได้ เนื่องจาก ได้ทำการเลือกไปแล้ว");
+            throw new Error("ผู้ใช้ไม่สามารถเข้าสู่ระบบได้ เนื่องจาก ได้ทำการเลือกไปแล้ว");  // ไม่อนุญาตให้เข้าสู่ระบบ
           }
 
           // ตรวจสอบว่ารหัสผ่านที่กรอกตรงกับที่เก็บในฐานข้อมูลหรือไม่
           if (posonal_number !== user.posonal_number) {
-            console.error("Invalid posonal_number");
-            return null;
+            console.error("รหัสผ่านไม่ถูกต้อง");
+            throw new Error("ไม่พบผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
           }
 
           // คืนค่าข้อมูลผู้ใช้ที่ผ่านการยืนยันตัวตนแล้ว
@@ -52,8 +58,8 @@ const authOptions = {
             user_type: user.user_type,
           };
         } catch (error) {
-          console.error("Authentication error:", error);  // แสดงข้อผิดพลาดในการยืนยันตัวตน
-          return null;
+          console.error("เกิดข้อผิดพลาดในการยืนยันตัวตน:", error);  // แสดงข้อผิดพลาดในการยืนยันตัวตน
+          throw new Error(error.message);
         }
       },
     }),

@@ -1,96 +1,79 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import NextImage from "next/image";
+import Cropper from "react-cropper";
+import "cropperjs/dist/cropper.css"; // Import Cropper CSS
 
 function CreatePostPage() {
-  // กำหนด state สำหรับข้อมูลที่กรอกในฟอร์ม
-  const [name, setName] = useState(""); // ชื่อ
-  const [lastname, setLastName] = useState(""); // นามสกุล
-  const [personal_ip, setPersonal_ip] = useState(""); // หมายเลขบัตรประชาชน
-  const [department, setDepartment] = useState(""); // คณะ
-  const [class_room, setClass_room] = useState(""); // ห้องเรียน
-  const [grade, setGrade] = useState(""); // ชั้นปี
-  const [img_work, setImg_work] = useState(""); // รูปภาพผลงาน
-  const [img_profile, setImg_profile] = useState(null); // รูปภาพโปรไฟล์
-  const [number_no, setNumber] = useState(""); // หมายเลข
-  const [party_policies, setParty_policies] = useState(""); // นโยบายพรรค
-  const [party_details, setParty_details] = useState(""); // รายละเอียดพรรค
-  const [party_slogan, setParty_slogan] = useState(""); // สโลแกนพรรค
+  const [name, setName] = useState("");
+  const [lastname, setLastName] = useState("");
+  const [personal_ip, setPersonal_ip] = useState("");
+  const [department, setDepartment] = useState("");
+  const [class_room, setClass_room] = useState("");
+  const [grade, setGrade] = useState("");
+  const [img_work, setImg_work] = useState(null);
+  const [img_profile, setImg_profile] = useState(null);
+  const [number_no, setNumber] = useState("");
+  const [party_policies, setParty_policies] = useState("");
+  const [party_details, setParty_details] = useState("");
+  const [party_slogan, setParty_slogan] = useState("");
 
-  const [preview_work, setPreview_work] = useState(null); // การแสดงตัวอย่างรูปผลงาน
-  const [preview_profile, setPreview_profile] = useState(null); // การแสดงตัวอย่างรูปโปรไฟล์
+  const [preview_work, setPreview_work] = useState(null);
+  const [preview_profile, setPreview_profile] = useState(null);
 
-  const [fileName_profile, setFileName_profile] = useState("โปรดเลือกรูป"); // ชื่อไฟล์รูปโปรไฟล์
-  const [fileName_work, setFileName_work] = useState("โปรดเลือกรูป"); // ชื่อไฟล์รูปผลงาน
+  const [fileName_profile, setFileName_profile] = useState("โปรดเลือกรูป");
+  const [fileName_work, setFileName_work] = useState("โปรดเลือกรูป");
 
-  const router = useRouter(); // ใช้ router สำหรับเปลี่ยนหน้า
+  const [croppingImage, setCroppingImage] = useState(null);
+  const [croppingType, setCroppingType] = useState(null);
+  const cropperRef = useRef(null);
 
-  // ฟังก์ชันสำหรับจัดการการเปลี่ยนแปลงรูปโปรไฟล์
+  const router = useRouter();
+
   const handleImgChange = (e) => {
-    const file = e.target.files[0]; // รับไฟล์รูปที่ผู้ใช้เลือก
+    const file = e.target.files[0];
     if (file) {
-      // สร้าง Object ของรูปภาพเพื่อตรวจสอบขนาด
-      const img = new Image();
-      img.onload = () => {
-        // ตรวจสอบขนาดรูปภาพ
-        if (img.width <= 200 && img.height <= 200) {
-          // ถ้าขนาดถูกต้อง ตั้งค่า state สำหรับรูปโปรไฟล์
-          setImg_profile(file);
-          setPreview_profile(URL.createObjectURL(file)); // แสดงตัวอย่างรูปโปรไฟล์
-          setFileName_profile(file.name); // แสดงชื่อไฟล์
-        } else {
-          // ถ้าขนาดเกินเกณฑ์ที่กำหนด
-          alert("ขนาดรูปภาพต้องไม่เกิน 200x200 พิกเซล");
-        }
-      };
-      img.src = URL.createObjectURL(file); // โหลดรูปเพื่อคำนวณขนาด
-    } else {
-      // ถ้าไม่มีการเลือกไฟล์รูปใหม่ ให้รีเซ็ตตัวอย่างรูปและชื่อไฟล์
-      setPreview_profile(null);
-      setFileName_profile("โปรดเลือกรูป");
+      setCroppingImage(URL.createObjectURL(file));
+      setCroppingType("profile");
     }
   };
 
-  // ฟังก์ชันสำหรับจัดการการเปลี่ยนแปลงรูปผลงาน
   const handleImgwork = (e) => {
-    const file = e.target.files[0]; // รับไฟล์รูปที่ผู้ใช้เลือก
+    const file = e.target.files[0];
     if (file) {
-      // สร้าง Object ของรูปภาพเพื่อตรวจสอบขนาด
-      const img = new Image();
-      img.onload = () => {
-        // ตรวจสอบขนาดรูปภาพ
-        if (img.width <= 320 && img.height <= 200) {
-          // ถ้าขนาดถูกต้อง ตั้งค่า state สำหรับรูปผลงาน
-          setImg_work(file);
-          setPreview_work(URL.createObjectURL(file)); // แสดงตัวอย่างรูปผลงาน
-          setFileName_work(file.name); // แสดงชื่อไฟล์
-        } else {
-          // ถ้าขนาดเกินเกณฑ์ที่กำหนด
-          alert("ขนาดรูปภาพต้องไม่เกิน 320x200 พิกเซล");
-        }
-      };
-      img.src = URL.createObjectURL(file); // โหลดรูปเพื่อคำนวณขนาด
-    } else {
-      // ถ้าไม่มีการเลือกไฟล์รูปใหม่ ให้รีเซ็ตตัวอย่างรูปและชื่อไฟล์
-      setPreview_work(null);
-      setFileName_work("โปรดเลือกรูป");
+      setCroppingImage(URL.createObjectURL(file));
+      setCroppingType("work");
     }
   };
 
-  // ฟังก์ชันสำหรับจัดการเมื่อผู้ใช้กดส่งข้อมูล
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // ป้องกันการรีเฟรชหน้าเว็บ
+  const handleCropSave = () => {
+    const cropper = cropperRef.current.cropper;
+    cropper.getCroppedCanvas().toBlob((blob) => {
+      if (croppingType === "profile") {
+        setImg_profile(blob);
+        setPreview_profile(URL.createObjectURL(blob));
+        setFileName_profile("Cropped Image");
+      } else if (croppingType === "work") {
+        setImg_work(blob);
+        setPreview_work(URL.createObjectURL(blob));
+        setFileName_work("Cropped Image");
+      }
+      setCroppingImage(null);
+      setCroppingType(null);
+    });
+  };
 
-    // ตรวจสอบให้แน่ใจว่าทุกฟิลด์ได้รับการกรอกข้อมูล
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
     if (!name || !lastname || !personal_ip || !grade || !number_no || !department || !class_room || !party_policies || !party_details || !party_slogan || !img_profile || !img_work) {
-      alert("กรุณากรอกข้อมูลให้ครบถ้วน"); // แจ้งเตือนหากข้อมูลไม่ครบ
+      alert("กรุณากรอกข้อมูลให้ครบถ้วน");
       return;
     }
 
-    // สร้าง FormData เพื่อส่งข้อมูลไปยัง API
     const formData = new FormData();
     formData.append("name", name);
     formData.append("lastname", lastname);
@@ -106,19 +89,18 @@ function CreatePostPage() {
     formData.append("img_work", img_work);
 
     try {
-      // ส่งข้อมูลไปยัง API สำหรับสร้างโพสต์ใหม่
       const res = await fetch("/api/election", {
         method: "POST",
-        body: formData, // ส่งข้อมูลที่บรรจุใน FormData
+        body: formData,
       });
 
       if (res.ok) {
-        router.push("/admin/management"); // หากการส่งข้อมูลสำเร็จ เปลี่ยนไปที่หน้า /admin/management
+        router.push("/admin/management");
       } else {
-        throw new Error("ไม่สามารถสร้างโพสต์ได้"); // ถ้ามีข้อผิดพลาดในการส่งข้อมูล
+        throw new Error("ไม่สามารถสร้างโพสต์ได้");
       }
     } catch (error) {
-      // ลบ console.log ที่ไม่จำเป็น
+      console.error(error);
     }
   };
 
@@ -130,7 +112,6 @@ function CreatePostPage() {
         </h3>
         <form onSubmit={handleSubmit} className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* ชื่อจริง */}
             <div>
               <label className="block text-lg font-medium text-gray-700 mb-2">
                 ชื่อจริง
@@ -143,8 +124,7 @@ function CreatePostPage() {
                 placeholder="ป้อนชื่อจริง"
               />
             </div>
-  
-            {/* ชื่อนามสกุล */}
+
             <div>
               <label className="block text-lg font-medium text-gray-700 mb-2">
                 ชื่อนามสกุล
@@ -157,8 +137,7 @@ function CreatePostPage() {
                 placeholder="ป้อนชื่อนามสกุล"
               />
             </div>
-  
-            {/* เลขประจำตัว */}
+
             <div>
               <label className="block text-lg font-medium text-gray-700 mb-2">
                 เลขประจำตัว
@@ -171,8 +150,7 @@ function CreatePostPage() {
                 placeholder="ป้อนเลขประจำตัว"
               />
             </div>
-  
-            {/* สาขาวิชา */}
+
             <div>
               <label className="block text-lg font-medium text-gray-700 mb-2">
                 สาขาวิชา
@@ -206,8 +184,7 @@ function CreatePostPage() {
                 <option value="ธุรกิจค้าปลีก">แผนกวิชาธุรกิจค้าปลีก</option>
               </select>
             </div>
-  
-            {/* ระดับชั้น */}
+
             <div>
               <label className="block text-lg font-medium text-gray-700 mb-2">
                 ระดับชั้น
@@ -231,8 +208,7 @@ function CreatePostPage() {
                 </optgroup>
               </select>
             </div>
-  
-            {/* ผลการเรียน */}
+
             <div>
               <label className="block text-lg font-medium text-gray-700 mb-2">
                 ผลการเรียน
@@ -245,8 +221,7 @@ function CreatePostPage() {
                 placeholder="ป้อนผลการเรียน"
               />
             </div>
-  
-            {/* เบอร์หมายเลข */}
+
             <div>
               <label className="block text-lg font-medium text-gray-700 mb-2">
                 เบอร์หมายเลข
@@ -255,7 +230,6 @@ function CreatePostPage() {
                 type="text"
                 value={number_no}
                 onChange={(e) => {
-                  // ตรวจสอบให้แน่ใจว่าเป็นตัวเลขเท่านั้น
                   const value = e.target.value;
                   if (/^\d*$/.test(value)) {
                     setNumber(value);
@@ -266,15 +240,13 @@ function CreatePostPage() {
               />
             </div>
           </div>
-  
+
           <div className="space-y-8 mt-8">
-            {/* แถวอินพุต */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {/* คอลัมน์ซ้าย: อินพุตสำหรับ รูปผลงานผู้สมัคร */}
               <div>
                 <label className="block text-lg font-medium text-gray-700 mb-2">
                   รูปผลงานผู้สมัคร
-                  <span className="text-red_1-500 text-sm ml-2">
+                  <span className="text-red-500 text-sm ml-2">
                     *รูปขนาดไม่เกิน 320x200px
                   </span>
                 </label>
@@ -299,12 +271,11 @@ function CreatePostPage() {
                   </span>
                 </div>
               </div>
-  
-              {/* คอลัมน์ขวา: อินพุตสำหรับ รูปผู้สมัคร */}
+
               <div>
                 <label className="block text-lg font-medium text-gray-700 mb-2">
                   รูปผู้สมัคร
-                  <span className="text-red_1-500 text-sm ml-2">
+                  <span className="text-red-500 text-sm ml-2">
                     *รูปขนาดไม่เกิน 200x200px
                   </span>
                 </label>
@@ -330,10 +301,8 @@ function CreatePostPage() {
                 </div>
               </div>
             </div>
-  
-            {/* แถวแสดงตัวอย่าง */}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
-              {/* คอลัมน์ซ้าย: ดูตัวอย่าง รูปผลงาน */}
               {preview_work && (
                 <div className="text-center">
                   <p className="text-lg font-medium text-gray-700 mb-2">
@@ -343,13 +312,12 @@ function CreatePostPage() {
                     src={preview_work}
                     alt="ตัวอย่างรูปผลงานผู้สมัคร"
                     width={320}
-                    height={200}
+                    height={180} // Adjusted to 16:9 aspect ratio
                     className="object-cover rounded-lg shadow mx-auto"
                   />
                 </div>
               )}
-  
-              {/* คอลัมน์ด้านขวา: ดูตัวอย่าง รูปผู้สมัคร */}
+
               {preview_profile && (
                 <div className="text-center">
                   <p className="text-lg font-medium text-gray-700 mb-2">
@@ -366,8 +334,7 @@ function CreatePostPage() {
               )}
             </div>
           </div>
-  
-          {/* สโลแกนพรรค */}
+
           <div>
             <label className="block text-lg font-medium text-gray-700 mb-2">
               สโลแกนพรรค
@@ -380,7 +347,7 @@ function CreatePostPage() {
               placeholder="ป้อนสโลแกนพรรค"
             />
           </div>
-  
+
           <div>
             <label className="block text-lg font-medium text-gray-700 mb-2">
               นโยบายพรรค
@@ -393,8 +360,7 @@ function CreatePostPage() {
               placeholder="ป้อนนโยบายพรรค"
             />
           </div>
-  
-          {/* ข้อมูลพรรค */}
+
           <div>
             <label className="block text-lg font-medium text-gray-700 mb-2">
               ข้อมูลพรรค
@@ -407,8 +373,7 @@ function CreatePostPage() {
               placeholder="ป้อนข้อมูลพรรค"
             />
           </div>
-  
-          {/* ปุ่มส่งข้อมูล */}
+
           <div className="flex justify-between">
             <button
               type="submit"
@@ -418,13 +383,45 @@ function CreatePostPage() {
             </button>
             <Link
               href="/admin/management"
-              className="bg-red hover:bg-red_1-600 text-white border py-3 px-6 rounded text-lg"
+              className="bg-red hover:bg-red-600 text-white border py-3 px-6 rounded text-lg"
             >
               ย้อนกลับ
             </Link>
           </div>
         </form>
       </div>
+
+      {croppingImage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-4 rounded-lg shadow-lg">
+            <Cropper
+              src={croppingImage}
+              style={{ height: 400, width: "100%" }}
+              aspectRatio={16 / 9}
+              guides={false}
+              ref={cropperRef}
+              viewMode={1}
+            />
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={() => {
+                  setCroppingImage(null);
+                  setCroppingType(null);
+                }}
+                className="bg-gray-500 text-white py-2 px-4 rounded-lg mr-2"
+              >
+                ยกเลิก
+              </button>
+              <button
+                onClick={handleCropSave}
+                className="bg-blue-500 text-white py-2 px-4 rounded-lg"
+              >
+                ยืนยัน
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
