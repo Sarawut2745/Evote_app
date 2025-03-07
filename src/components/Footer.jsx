@@ -1,11 +1,14 @@
-import React from 'react'
+import React from "react";
 
-function Footer() {
+function Footer({ className = "" }) {
   return (
-    <footer className='bg-[#333] justify-center items-center p-2 text-white text-center'>
-        <p>Copyright 2024.</p>
+    <footer className={`bg-[#d6ccc2] py-10 ${className}`}>
+      <div className="mt-1 text-center text-gray-500 text-lg">
+        © {new Date().getFullYear()} วิทยาลัยอาชีวศึกษาสุพรรณบุรี.
+        สงวนลิขสิทธิ์.
+      </div>
     </footer>
-  )
+  );
 }
 
-export default Footer
+export default Footer;

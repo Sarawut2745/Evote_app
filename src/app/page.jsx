@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
+import Footer from "../components/Footer";
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -82,7 +83,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <header className="bg-white shadow p-4 flex items-center justify-between">
+      <header className="bg-[#d6ccc2] shadow p-4 flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Image src="/images/logo.png" alt="Logo" width={50} height={50} />
           <h1 className="text-lg font-semibold">
@@ -97,7 +98,7 @@ export default function Home() {
               </a>
             </li>
             <li>
-              <a href="#" className="hover:text-blue-500">
+              <a href="/candidate-info" className="hover:text-blue-500">
                 ข้อมูลผู้สมัคร
               </a>
             </li>
@@ -219,7 +220,6 @@ export default function Home() {
       </section>
 
       {/* Candidates Section */}
-      {/* Candidates Section */}
       <section className="py-16 bg-blue-50 text-center">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-gray-800">ผู้สมัคร</h2>
@@ -262,6 +262,7 @@ export default function Home() {
             ))}
         </div>
       </section>
+      <Footer />
     </div>
   );
 }

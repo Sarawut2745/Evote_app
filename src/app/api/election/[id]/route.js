@@ -8,14 +8,17 @@ import fs from "fs/promises"; // ใช้ฟังก์ชันต่าง�
 // ฟังก์ชัน GET สำหรับดึงข้อมูลโพสต์ตาม ID
 export async function GET(req, { params }) {
   const { id } = params;
+  console.log("Fetching post with ID:", id); // Debugging statement
   try {
     await connectMongoDB(); // เชื่อมต่อกับ MongoDB
     const post = await Post.findOne({ _id: id }); // ค้นหาข้อมูลโพสต์ตาม ID
+    console.log("Post fetched:", post); // Debugging statement
     if (!post) {
       return NextResponse.json({ error: "ไม่พบโพสต์" }, { status: 404 }); // หากไม่พบโพสต์ ส่งข้อความผิดพลาด
     }
     return NextResponse.json({ post }, { status: 200 }); // ส่งข้อมูลโพสต์
   } catch (error) {
+    console.error("Error fetching post:", error); // Debugging statement
     return NextResponse.json(
       { error: "ไม่สามารถดึงข้อมูลโพสต์ได้" },
       { status: 500 } // หากเกิดข้อผิดพลาด ส่งข้อความผิดพลาด
@@ -26,6 +29,7 @@ export async function GET(req, { params }) {
 // ฟังก์ชัน PUT สำหรับอัปเดตข้อมูลโพสต์
 export async function PUT(req, { params }) {
   const { id } = params;
+  console.log("Updating post with ID:", id); // Debugging statement
 
   try {
     const formData = await req.formData(); // รับข้อมูลจากฟอร์ม
@@ -41,6 +45,22 @@ export async function PUT(req, { params }) {
     const party_details = formData.get("party_details"); // รายละเอียดพรรค
     const party_slogan = formData.get("party_slogan"); // สโลแกนพรรค
     const img_work = formData.get("img_work"); // รูปผลงาน
+
+    // Log form data for debugging
+    console.log("Form Data:", {
+      name,
+      lastname,
+      personal_ip,
+      img_profile,
+      grade,
+      number_no,
+      department,
+      class_room,
+      party_policies,
+      party_details,
+      party_slogan,
+      img_work,
+    });
 
     // ตรวจสอบว่ามีข้อมูลครบถ้วนหรือไม่
     if (
@@ -60,6 +80,7 @@ export async function PUT(req, { params }) {
 
     await connectMongoDB(); // เชื่อมต่อกับ MongoDB
     const post = await Post.findById(id); // ค้นหาข้อมูลโพสต์ตาม ID
+    console.log("Post found:", post); // Debugging statement
     if (!post) {
       return NextResponse.json({ message: "ไม่พบโพสต์", status: 404 }); // หากไม่พบโพสต์ ส่งข้อความผิดพลาด
     }
@@ -133,12 +154,14 @@ export async function PUT(req, { params }) {
       { new: true } // คืนค่าข้อมูลโพสต์ที่อัปเดต
     );
 
+    console.log("Post updated:", updatedPost); // Debugging statement
     return NextResponse.json({
       message: "อัปเดตโพสต์สำเร็จ",
       updatedPost,
       status: 200,
     }); // ส่งข้อความและข้อมูลโพสต์ที่อัปเดต
   } catch (error) {
+    console.error("Error updating post:", error); // Debugging statement
     return NextResponse.json({
       message: "ไม่สามารถอัปเดตโพสต์ได้",
       error: error.message,
