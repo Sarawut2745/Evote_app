@@ -24,7 +24,7 @@ function Navbar() {
             className="rounded-lg"
           />
         </Link>
-        <h1 className="text-xl font-semibold tracking-wide">
+        <h1 className="text-xl font-semibold tracking-wide text-black">
           การเลือกตั้งวิทยาลัย อาชีวศึกษา สุพรรณบุรี
         </h1>
       </div>
@@ -34,7 +34,7 @@ function Navbar() {
           <li>
             <button
               onClick={handleLogout}
-              className="bg-red-600 text-white px-4 py-1 rounded-md text-lg 
+              className="bg-red_1-600 text-white px-4 py-1 rounded-md text-lg 
                 shadow-lg hover:bg-red-700 transition-all duration-300 
                 border-2 border-transparent hover:border-red-800
                 focus:outline-none focus:ring-2 focus:ring-red-400"

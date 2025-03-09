@@ -7,6 +7,10 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { signOut, useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+
+const MySwal = withReactContent(Swal);
 
 export default function Home() {
   const [postData, setPostData] = useState([]); // เก็บข้อมูลโพสต์ของผู้สมัคร
@@ -14,43 +18,8 @@ export default function Home() {
   const [modalOpen, setModalOpen] = useState(false); // ใช้จัดการสถานะการเปิด/ปิด modal
   const [isClosing, setIsClosing] = useState(false); // ใช้ติดตามสถานะการปิด modal
   const [isNoVote, setIsNoVote] = useState(false); // ใช้ติดตามสถานะการเลือกไม่โหวต
-  const [countdown, setCountdown] = useState(""); // เก็บเวลานับถอยหลัง
 
   const { data: session, status } = useSession(); // ใช้ session ในการตรวจสอบสถานะการเข้าสู่ระบบ
-
-  // ฟังก์ชันคำนวณเวลาในการนับถอยหลัง
-  const calculateCountdown = () => {
-    const now = new Date();
-    const currentTime =
-      now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds(); // แปลงเวลาเป็นวินาที
-    let targetTime = 8 * 3600; // ตั้งเวลาเป้าหมายเป็น 08:00:00 ในหน่วยวินาที
-
-    if (currentTime >= targetTime && currentTime < 15 * 3600) {
-      // ถ้าเวลาปัจจุบันอยู่ระหว่าง 08:00 - 15:00 ให้ตั้งเป้าหมายเป็น 15:00
-      targetTime = 15 * 3600;
-    } else if (currentTime < targetTime) {
-      // ถ้าเวลาปัจจุบันก่อน 08:00 ให้ตั้งเป้าหมายเป็น 08:00
-      targetTime = 8 * 3600;
-    }
-
-    const timeDifference = targetTime - currentTime;
-    if (timeDifference <= 0) {
-      setCountdown("เวลาการเลือกตั้งหมดเวลาลงแล้ว!"); // เมื่อเวลาเริ่มแล้ว
-    } else {
-      const hours = Math.floor(timeDifference / 3600);
-      const minutes = Math.floor((timeDifference % 3600) / 60);
-      const seconds = timeDifference % 60;
-      setCountdown(`${hours} ชั่วโมง ${minutes} นาที ${seconds} วินาที`); // แสดงเวลาในการนับถอยหลัง
-    }
-  };
-
-  useEffect(() => {
-    // เริ่มต้นการนับถอยหลังเมื่อ component โหลด
-    const countdownInterval = setInterval(calculateCountdown, 1000);
-
-    // ล้างการตั้งเวลาเมื่อ component ถูกทำลาย
-    return () => clearInterval(countdownInterval);
-  }, []);
 
   useEffect(() => {
     // ดึงข้อมูลผู้สมัครเมื่อ component โหลด
@@ -114,7 +83,7 @@ export default function Home() {
   const openNoVoteModal = () => {
     setSelectedPost(null); // ไม่มีผู้สมัครที่เลือก
     setIsNoVote(true); // ตั้งสถานะให้เป็นการเลือกไม่ลงคะแนน
-    setModalOpen(true); // เปิด modal
+    confirmVote(); // ยืนยันการเลือกไม่ลงคะแนนทันที
   };
 
   // ฟังก์ชันปิด modal
@@ -124,6 +93,24 @@ export default function Home() {
       setModalOpen(false); // ปิด modal หลังจาก 300ms
       setIsClosing(false); // รีเซ็ตสถานะการปิด modal
     }, 300);
+  };
+
+  // ฟังก์ชันยืนยันการลงคะแนนเสียง
+  const confirmVote = () => {
+    MySwal.fire({
+      title: isNoVote ? 'ยืนยันไม่ประสงค์ลงคะแนน?' : 'ยืนยันการลงคะแนน?',
+      text: isNoVote ? 'คุณแน่ใจหรือไม่ว่าต้องการไม่ลงคะแนน?' : 'คุณแน่ใจหรือไม่ว่าต้องการยืนยันการลงคะแนน?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: isNoVote ? '#d33' : '#3085d6',
+      cancelButtonColor: '#aaa',
+      confirmButtonText: isNoVote ? 'ไม่ลงคะแนน' : 'ยืนยัน',
+      cancelButtonText: 'ยกเลิก'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleVote();
+      }
+    });
   };
 
   // ถ้ากำลังโหลด session
@@ -140,103 +127,93 @@ export default function Home() {
     <main>
       <Container>
         <Navbar session={session} />
-        <div className="flex-grow bg-gray-100 text-center p-8 md:p-10 lg:p-12">
+        <div className="flex-grow bg-gray-100 text-center p-8 md:p-10 lg:p-12 relative">
           <h3 className="text-black text-xl md:text-3xl lg:text-4xl font-bold mb-10">
-            รายชื่อผู้สมัคร
+            ผู้สมัครเลือกตั้ง
           </h3>
 
-          <h1></h1>
-
-          {/* ถ้ามีข้อมูลผู้สมัคร */}
           {postData && postData.length > 0 ? (
             <>
-              {/* แสดงรายชื่อผู้สมัครในรูปแบบกริด */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                {postData.map((val) => (
-                  <div
-                    key={val._id}
-                    className="shadow-xl p-6 rounded-lg flex flex-col items-center bg-white transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl"
-                  >
-                    {/* ชื่อผู้สมัคร */}
-                    <h4 className="text-xl md:text-2xl font-semibold text-gray-900 mb-5">
-                      {val.name}
-                    </h4>
-
-                    {/* รูปภาพของผู้สมัคร */}
-                    <div className="flex justify-center w-full mb-3">
-                      <Image
-                        className="rounded-lg shadow-md"
-                        src={`/assets/election/profile/${val.img_profile}`}
-                        width={220}
-                        height={220}
-                        alt={val.name}
-                        style={{ objectFit: "cover" }}
-                      />
-                    </div>
-
-                    {/* ปุ่มเลือกผู้สมัคร */}
-                    <button
-                      onClick={() => openModal(val)}
-                      className="relative h-12 w-44 md:w-48 lg:w-52 overflow-hidden rounded-lg bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-semibold shadow-lg transition-all duration-300 hover:from-blue-600 hover:to-indigo-600 hover:shadow-xl"
+              <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 px-4 md:px-8">
+                {postData
+                  .sort((a, b) => a.number_no - b.number_no) // เรียงลำดับตามหมายเลข
+                  .map((candidate) => (
+                    <div
+                      key={candidate._id}
+                      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow transform hover:scale-105"
                     >
-                      <span className="relative z-10">เลือก</span>
-                    </button>
-                  </div>
-                ))}
+                      <div className="relative w-full h-60">
+                        <Image
+                          src={`/assets/election/profile/${candidate.img_profile}`} // ใช้รูปภาพจากข้อมูลผู้สมัคร
+                          alt={candidate.name}
+                          layout="fill"
+                          objectFit="cover"
+                        />
+                        <div className="absolute top-0 left-0 bg-yellow-500 text-white text-4xl font-bold p-2 rounded-br-lg">
+                          {candidate.number_no} {/* เบอร์ผู้สมัคร */}
+                        </div>
+                      </div>
+                      <div className="p-4 text-left">
+                        <h3 className="text-lg font-semibold text-gray-800">{`เบอร์ ${candidate.number_no}`}</h3>
+                        <p className="text-sm text-gray-600">
+                          {candidate.name} {candidate.lastname}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          ชมรมวิชาชีพ {candidate.department}
+                        </p>
+                        <p className="mt-2 text-sm text-gray-700 italic">
+                          {`"${candidate.party_slogan}"`} {/* คำขวัญ */}
+                        </p>
+                        <div className="mt-4 flex justify-center">
+                          <button
+                            onClick={() => openModal(candidate)}
+                            className="relative h-12 w-44 md:w-48 lg:w-52 overflow-hidden rounded-lg bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold shadow-lg transition-all duration-300 hover:from-green-600 hover:to-green-700 hover:shadow-xl"
+                          >
+                            <span className="relative z-10">ลงคะแนน</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
               </div>
 
-              {/* ปุ่มสำหรับเลือกไม่ลงคะแนน */}
-              <div className="relative">
+              <div className="fixed my-20 bottom-4 right-4">
                 <button
                   onClick={openNoVoteModal}
-                  className="fixed bottom-16 right-6 h-16 w-64 overflow-hidden rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold shadow-lg transition-all duration-300 hover:from-blue-700 hover:to-blue-800 hover:shadow-xl"
+                  className="h-16 w-64 overflow-hidden rounded-lg bg-gradient-to-r from-red_1-500 to-red_1-600 text-white font-semibold shadow-lg transition-all duration-300 hover:from-red_1-500 hover:to-red_1-600 hover:shadow-xl"
                 >
                   <span className="relative z-10">ไม่ประสงค์ลงคะแนน</span>
                 </button>
               </div>
             </>
           ) : (
-            // ถ้าไม่มีข้อมูลผู้สมัคร
             <p className="text-gray-700 text-lg md:text-xl italic">
               ไม่มีข้อมูลผู้สมัครในขณะนี้
             </p>
           )}
         </div>
-
-        {/* ส่วนแสดงเวลานับถอยหลัง */}
-        <div className="fixed bottom-0 left-0 w-full bg-green-600 text-white text-center py-2 z-40">
-          <p>เวลานับถอยหลังการเลือกตั้ง: {countdown}</p>
-        </div>
-
-        <Footer />
-
+        <Footer className="py-5" />
         {modalOpen && (
           <div
-            className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 
-      transition-opacity duration-300 ease-in-out ${
-        isClosing ? "opacity-0" : "opacity-100"
-      }`}
+            className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 transition-opacity duration-300 ease-in-out ${
+              isClosing ? "opacity-0" : "opacity-100"
+            }`}
             onClick={closeModal}
           >
             <div
-              className={`bg-white rounded-lg shadow-lg max-w-4xl w-full transform transition-transform duration-300 
-        ease-in-out ${
-          isClosing ? "scale-95 opacity-0" : "scale-100 opacity-100"
-        }`}
+              className={`bg-white rounded-lg shadow-lg max-w-4xl w-full transform transition-transform duration-300 ease-in-out ${
+                isClosing ? "scale-95 opacity-0" : "scale-100 opacity-100"
+              }`}
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6 max-h-[80vh] overflow-y-auto">
-                {/* หัวข้อ Modal ที่แสดงข้อความยืนยัน */}
                 <h2 className="text-xl text-black font-bold mb-6 text-center">
                   {isNoVote ? "ยืนยันไม่ประสงค์ลงคะแนน" : "ยืนยันการลงคะแนน"}
                 </h2>
-
-                {/* ถ้าไม่ใช่การเลือกไม่ลงคะแนน แสดงข้อมูลของผู้สมัคร */}
                 {!isNoVote && selectedPost && (
                   <>
                     <div className="flex justify-between gap-8 mb-6">
                       <div className="flex-1 flex justify-center">
-                        {/* รูปภาพของผู้สมัคร */}
                         <Image
                           className="rounded-md"
                           src={`/assets/election/profile/${selectedPost.img_profile}`}
@@ -246,9 +223,7 @@ export default function Home() {
                           style={{ objectFit: "cover" }}
                         />
                       </div>
-
                       <div className="flex-1 flex justify-center">
-                        {/* รูปภาพผลงานของผู้สมัคร */}
                         <Image
                           className="rounded-md"
                           src={`/assets/election/work/${selectedPost.img_work}`}
@@ -259,8 +234,6 @@ export default function Home() {
                         />
                       </div>
                     </div>
-
-                    {/* แสดงข้อมูลผู้สมัคร */}
                     <div className="mb-6 flex justify-center">
                       <div className="flex w-full max-w-3xl mx-auto">
                         <div className="flex-1 pr-4 pl-32">
@@ -270,14 +243,12 @@ export default function Home() {
                             </strong>{" "}
                             {selectedPost.name} {selectedPost.lastname}
                           </div>
-
                           <div className="mb-4">
                             <strong className="text-black font-bold">
                               ชั้นเรียน:
                             </strong>{" "}
                             {selectedPost.class_room}
                           </div>
-
                           <div className="mb-4">
                             <strong className="text-black font-bold">
                               แผนก:
@@ -285,7 +256,6 @@ export default function Home() {
                             {selectedPost.department}
                           </div>
                         </div>
-
                         <div className="flex-1 pl-4">
                           <div className="mb-4">
                             <strong className="text-black font-bold">
@@ -293,25 +263,15 @@ export default function Home() {
                             </strong>{" "}
                             {selectedPost.grade}
                           </div>
-
                           <div className="mb-4">
                             <strong className="text-black font-bold">
                               เบอร์หมายเลข:
                             </strong>{" "}
                             {selectedPost.number_no}
                           </div>
-
-                          <div className="mb-4">
-                            <strong className="text-black font-bold">
-                              เลขประจำตัว:
-                            </strong>{" "}
-                            {selectedPost.personal_ip}
-                          </div>
                         </div>
                       </div>
                     </div>
-
-                    {/* แสดงนโยบายพรรค */}
                     <div className="mb-6">
                       <p className="mb-4">
                         <strong className="text-black font-bold">
@@ -322,8 +282,6 @@ export default function Home() {
                         {selectedPost.party_policies}
                       </p>
                     </div>
-
-                    {/* แสดงรายละเอียดพรรค */}
                     <div className="mb-6">
                       <p className="mb-4">
                         <strong className="text-black font-bold">
@@ -336,8 +294,6 @@ export default function Home() {
                     </div>
                   </>
                 )}
-
-                {/* ถ้าเลือกไม่ลงคะแนน */}
                 {isNoVote && (
                   <div className="text-center">
                     <p className="text-lg text-gray-700 mb-6">
@@ -346,22 +302,16 @@ export default function Home() {
                   </div>
                 )}
               </div>
-
-              {/* ปุ่มยืนยันหรือยกเลิก */}
-              <div className="p-4 border-t border-gray-200 flex justify-end">
+              <div className="p-4 border-t border-gray-200 flex justify-end gap-4">
                 <button
                   onClick={closeModal}
-                  className="btn bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg mr-2"
+                  className="bg-red_1-500 hover:bg-red_1-600 text-white py-2 px-6 rounded-lg shadow-md transition-all"
                 >
                   ยกเลิก
                 </button>
                 <button
-                  onClick={handleVote}
-                  className={`btn text-white py-3 px-4 rounded-lg ${
-                    isNoVote
-                      ? "bg-red_1-500 hover:bg-red_1-600"
-                      : "bg-red_1-500 hover:bg-red_1-600"
-                  }`}
+                  onClick={confirmVote}
+                  className={`py-2 px-6 rounded-lg shadow-md transition-all text-white ${isNoVote ? "bg-red_1-500 hover:bg-red_1-600" : "bg-green-500 hover:bg-green-600"}`}
                 >
                   {isNoVote ? "ไม่ลงคะแนน" : "ยืนยัน"}
                 </button>

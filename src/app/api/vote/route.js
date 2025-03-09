@@ -9,7 +9,7 @@ export async function POST(req) {
     console.log("Request Body:", body); // ตรวจสอบข้อมูลที่ได้รับ
 
     const { user_type, number_no } = body;
-    if (!user_type || !number_no) {
+    if (user_type === undefined || number_no === undefined) {
       return NextResponse.json({ message: "ข้อมูลไม่ครบ" }, { status: 400 });
     }
 

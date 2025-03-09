@@ -93,7 +93,7 @@ export default async function CandidateDetail({ params }) {
         {/* Description */}
         <section className="prose prose-p:text-gray-700 prose-p:leading-relaxed mb-12">
           <h2>คำอธิบาย</h2>
-          <p>{candidateData.description || "ไม่มีคำอธิบายเพิ่มเติม"}</p>
+          <p>{candidateData.party_details || "ไม่มีคำอธิบายเพิ่มเติม"}</p>
         </section>
 
         {/* Policies */}

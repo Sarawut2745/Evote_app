@@ -7,8 +7,8 @@ export async function GET(req) {
     // เชื่อมต่อกับ MongoDB
     await connectMongoDB();
 
-    // ดึงข้อมูลผู้ใช้ทั้งหมดจากโมเดล User
-    const users = await User.find();
+    // ดึงข้อมูลผู้ใช้ที่มี role เป็น "user" จากโมเดล User
+    const users = await User.find({ role: "user" });
 
     // ส่งข้อมูลผู้ใช้กลับมาในรูปแบบ JSON
     return NextResponse.json(users, { status: 200 });

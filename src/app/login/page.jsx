@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Navbar from "../../components/Navbar";
+import Image from "next/image";
 import Footer from "../../components/Footer";
 
 function LoginPage() {
@@ -17,7 +18,9 @@ function LoginPage() {
 
   useEffect(() => {
     if (session) {
-      session.user.role === "admin" ? router.replace("/admin") : router.replace("/vote");
+      session.user.role === "admin"
+        ? router.replace("/admin")
+        : router.replace("/vote");
     }
   }, [session, router]);
 
@@ -33,7 +36,11 @@ function LoginPage() {
     }
 
     try {
-      const res = await signIn("credentials", { name, posonal_number, redirect: false });
+      const res = await signIn("credentials", {
+        name,
+        posonal_number,
+        redirect: false,
+      });
       if (res?.error) {
         setError("ผู้ใช้ไม่สามารถเข้าสู่ระบบได้");
         setIsLoading(false);
@@ -48,21 +55,55 @@ function LoginPage() {
   return (
     <div className="min-h-screen bg-gray-100 px-0 relative">
       {/* Navbar */}
-      <Navbar />
+      <header className="bg-[#d6ccc2] shadow p-4 flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <Image src="/images/logo.png" alt="Logo" width={50} height={50} />
+          <h1 className="text-lg font-semibold">
+            การเลือกตั้งวิทยาลัย อาชีวศึกษา สุพรรณบุรี
+          </h1>
+        </div>
+        <nav>
+          <ul className="flex space-x-4 text-gray-700">
+            <li>
+              <a href="/" className="hover:text-blue-500">
+                หน้าหลัก
+              </a>
+            </li>
+            <li>
+              <a href="/candidate-info" className="hover:text-blue-500">
+                ข้อมูลผู้สมัคร
+              </a>
+            </li>
+            <li>
+              <a href="/login" className="hover:text-blue-500">
+                เข้าสู่ระบบ
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 bg-white shadow-lg rounded-xl overflow-hidden max-w-6xl w-full mx-auto mt-32">
         {/* Left Side: Image */}
         <div className="relative hidden md:block">
-          <img src="/images/login/login.jpg" alt="Background" className="w-full h-full object-cover" />
+          <img
+            src="/images/login/login.jpg"
+            alt="Background"
+            className="w-full h-full object-cover"
+          />
         </div>
-        
+
         {/* Right Side: Form */}
         <div className="p-12 flex flex-col justify-center w-full">
-          <h2 className="text-3xl font-bold mb-8 text-gray-800 text-center">เข้าสู่ระบบ</h2>
-          
+          <h2 className="text-3xl font-bold mb-8 text-gray-800 text-center">
+            เข้าสู่ระบบ
+          </h2>
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-gray-700 text-lg">เลขประจำตัวนักเรียน/นักศึกษา</label>
+              <label className="block text-gray-700 text-lg">
+                เลขประจำตัวนักเรียน/นักศึกษา
+              </label>
               <input
                 type="text"
                 value={name}
@@ -72,7 +113,12 @@ function LoginPage() {
               />
             </div>
             <div>
-              <label className="block text-gray-700 text-lg">รหัสผ่าน <span className="text-sm text-red_1-500">*เลขประจำตัวประชาชน*</span></label>
+              <label className="block text-gray-700 text-lg">
+                รหัสผ่าน{" "}
+                <span className="text-sm text-red_1-500">
+                  *เลขประจำตัวประชาชน*
+                </span>
+              </label>
               <input
                 type="password"
                 value={posonal_number}
@@ -88,7 +134,9 @@ function LoginPage() {
               {isLoading ? "กำลังโหลด..." : "เข้าสู่ระบบ"}
             </button>
           </form>
-          {error && <p className="text-red_1-500 text-center mt-4 text-lg">{error}</p>}
+          {error && (
+            <p className="text-red_1-500 text-center mt-4 text-lg">{error}</p>
+          )}
         </div>
       </div>
       <Footer className="mt-20" />
