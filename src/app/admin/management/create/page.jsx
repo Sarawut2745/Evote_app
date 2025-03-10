@@ -10,7 +10,7 @@ import "cropperjs/dist/cropper.css"; // Import Cropper CSS
 function CreatePostPage() {
   const [name, setName] = useState("");
   const [lastname, setLastName] = useState("");
-  const [personal_ip, setPersonal_ip] = useState("");
+  const [personal_id, setpersonal_id] = useState("");
   const [department, setDepartment] = useState("");
   const [class_room, setClass_room] = useState("");
   const [grade, setGrade] = useState("");
@@ -69,7 +69,7 @@ function CreatePostPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!name || !lastname || !personal_ip || !grade || !number_no || !department || !class_room || !party_policies || !party_details || !party_slogan || !img_profile || !img_work) {
+    if (!name || !lastname || !personal_id || !grade || !number_no || !department || !class_room || !party_policies || !party_details || !party_slogan || !img_profile || !img_work) {
       alert("กรุณากรอกข้อมูลให้ครบถ้วน");
       return;
     }
@@ -77,7 +77,7 @@ function CreatePostPage() {
     const formData = new FormData();
     formData.append("name", name);
     formData.append("lastname", lastname);
-    formData.append("personal_ip", personal_ip);
+    formData.append("personal_id", personal_id);
     formData.append("grade", grade);
     formData.append("number_no", number_no);
     formData.append("department", department);
@@ -144,8 +144,8 @@ function CreatePostPage() {
               </label>
               <input
                 type="text"
-                value={personal_ip}
-                onChange={(e) => setPersonal_ip(e.target.value)}
+                value={personal_id}
+                onChange={(e) => setpersonal_id(e.target.value)}
                 className="w-full bg-gray-100 border border-gray-300 py-3 px-4 rounded-lg text-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="ป้อนเลขประจำตัว"
               />

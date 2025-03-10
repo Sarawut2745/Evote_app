@@ -12,7 +12,7 @@ export async function POST(req) {
     const formData = await req.formData(); // รับข้อมูลจากฟอร์ม
     const name = formData.get("name"); // ชื่อ
     const lastname = formData.get("lastname"); // นามสกุล
-    const personal_ip = formData.get("personal_ip"); // หมายเลขบัตรประชาชน
+    const personal_id = formData.get("personal_id"); // หมายเลขบัตรประชาชน
     const img_profile = formData.get("img_profile"); // รูปโปรไฟล์
     const grade = formData.get("grade"); // ชั้นปี
     const number_no = formData.get("number_no"); // หมายเลขผู้สมัคร
@@ -27,7 +27,7 @@ export async function POST(req) {
     if (
       !name ||
       !lastname ||
-      !personal_ip ||
+      !personal_id ||
       !img_profile ||
       !grade ||
       !number_no ||
@@ -43,7 +43,7 @@ export async function POST(req) {
         missingFields: {
           name: !name,
           lastname: !lastname,
-          personal_ip: !personal_ip,
+          personal_id: !personal_id,
           img_profile: !img_profile,
           grade: !grade,
           number_no: !number_no,
@@ -59,12 +59,12 @@ export async function POST(req) {
     }
 
     // แปลงฟิลด์ที่เป็นตัวเลขเป็นตัวเลขจริง
-    const personal_ipNumber = Number(personal_ip);
+    const personal_idNumber = Number(personal_id);
     const gradeNumber = Number(grade);
     const number_noNumber = Number(number_no);
 
     // ตรวจสอบว่าฟิลด์ตัวเลขถูกต้อง
-    if (isNaN(personal_ipNumber) || isNaN(gradeNumber) || isNaN(number_noNumber)) {
+    if (isNaN(personal_idNumber) || isNaN(gradeNumber) || isNaN(number_noNumber)) {
       return NextResponse.json({ message: "รูปแบบตัวเลขไม่ถูกต้อง", status: 400 });
     }
 
@@ -107,7 +107,7 @@ export async function POST(req) {
     const savedPost = await Post.create({
       name,
       lastname, // รวมถึงนามสกุลด้วย
-      personal_ip: personal_ipNumber,
+      personal_id: personal_idNumber,
       img_profile: profileFileWithExt,
       grade: gradeNumber,
       number_no: number_noNumber,

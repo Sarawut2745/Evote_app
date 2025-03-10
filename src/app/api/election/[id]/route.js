@@ -35,7 +35,7 @@ export async function PUT(req, { params }) {
     const formData = await req.formData(); // รับข้อมูลจากฟอร์ม
     const name = formData.get("name"); // ชื่อ
     const lastname = formData.get("lastname"); // นามสกุล
-    const personal_ip = formData.get("personal_ip"); // หมายเลขบัตรประชาชน
+    const personal_id = formData.get("personal_id"); // หมายเลขบัตรประชาชน
     const img_profile = formData.get("img_profile"); // รูปโปรไฟล์
     const grade = formData.get("grade"); // ชั้นปี
     const number_no = formData.get("number_no"); // หมายเลขผู้สมัคร
@@ -50,7 +50,7 @@ export async function PUT(req, { params }) {
     console.log("Form Data:", {
       name,
       lastname,
-      personal_ip,
+      personal_id,
       img_profile,
       grade,
       number_no,
@@ -66,7 +66,7 @@ export async function PUT(req, { params }) {
     if (
       !name ||
       !lastname ||
-      !personal_ip ||
+      !personal_id ||
       !grade ||
       !number_no ||
       !department ||
@@ -140,7 +140,7 @@ export async function PUT(req, { params }) {
       {
         name,
         lastname,
-        personal_ip,
+        personal_id,
         grade,
         img_profile: profileImgFilename,
         img_work: workImgFilename,

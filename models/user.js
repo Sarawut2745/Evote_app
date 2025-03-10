@@ -8,8 +8,4 @@ const userSchema = new Schema({
     role: { type: String, default: "user" },
 }, { timestamps: true });
 
-// ล้างโมเดลเดิมออกก่อนถ้ามีการกำหนดไว้แล้ว
-mongoose.models = {};
-
-const User = mongoose.model("User", userSchema);
-export default User;
+export default mongoose.models.User || mongoose.model("User", userSchema);

@@ -12,7 +12,7 @@ function EditPostPage({ params }) {
   const [postData, setPostData] = useState({});
   const [name, setName] = useState("");
   const [lastname, setLastName] = useState("");
-  const [personal_ip, setPersonal_ip] = useState("");
+  const [personal_id, setpersonal_id] = useState("");
   const [department, setDepartment] = useState("");
   const [class_room, setClass_room] = useState("");
   const [grade, setGrade] = useState("");
@@ -46,7 +46,7 @@ function EditPostPage({ params }) {
       setPostData(data);
       setName(data.post?.name || "");
       setLastName(data.post?.lastname || "");
-      setPersonal_ip(data.post?.personal_ip || "");
+      setpersonal_id(data.post?.personal_id || "");
       setDepartment(data.post?.department || "");
       setClass_room(data.post?.class_room || "");
       setGrade(data.post?.grade || "");
@@ -104,7 +104,7 @@ function EditPostPage({ params }) {
     const formData = new FormData();
     formData.append("name", name);
     formData.append("lastname", lastname);
-    formData.append("personal_ip", personal_ip);
+    formData.append("personal_id", personal_id);
     formData.append("department", department);
     formData.append("class_room", class_room);
     formData.append("grade", grade);
@@ -172,8 +172,8 @@ function EditPostPage({ params }) {
               </label>
               <input
                 type="text"
-                value={personal_ip}
-                onChange={(e) => setPersonal_ip(e.target.value)}
+                value={personal_id}
+                onChange={(e) => setpersonal_id(e.target.value)}
                 className="w-full bg-gray-100 border border-gray-300 py-3 px-4 rounded-lg text-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 placeholder="ป้อนเลขประจำตัว"
               />

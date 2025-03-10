@@ -4,7 +4,7 @@ const ElectionSchema = new Schema(
     {
         name: { type: String, required: true },
         lastname: { type: String, required: true },
-        personal_ip: { type: Number, required: true },
+        personal_id: { type: Number, required: true },
         department: { type: String, required: true },
         class_room: { type: String, required: true },
         grade: { type: Number, required: true },
