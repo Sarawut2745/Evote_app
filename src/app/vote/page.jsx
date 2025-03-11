@@ -45,8 +45,9 @@ export default function Home() {
   const handleVote = async () => {
     try {
       const voteData = isNoVote
-        ? { user_type: session?.user?.user_type, number_no: 0 } // ถ้าเลือกไม่ลงคะแนน
+        ? { _id: session?.user?.id, user_type: session?.user?.user_type, number_no: 0 } // ถ้าเลือกไม่ลงคะแนน
         : {
+            _id: session?.user?.id, // เพิ่ม _id ของผู้ใช้จาก session
             user_type: session?.user?.user_type,
             number_no: selectedPost?.number_no, // ลงคะแนนให้ผู้สมัคร
           };
